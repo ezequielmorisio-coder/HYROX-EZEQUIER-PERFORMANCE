@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#060810">
+<title>Road My Plan · HYROX Performance</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#060810;--bg2:#0e0f1a;--bg3:#141525;--bg4:#1c1d2e;--bg5:#22243a;
+  --blue:#2196F3;--blue2:#42A5F5;--blue-glow:rgba(33,150,243,.25);
+  --orange:#FF9800;--red:#f44336;--green:#4CAF50;--purple:#9C27B0;
+  --gold:#FFD700;--teal:#00BCD4;
+  --txt:#F0F2FF;--txt2:#9BA3C4;--txt3:#5A6285;--txt4:#2E3155;
+  --radius:18px;--radius-sm:12px;--radius-xs:8px;
+  --shadow:0 4px 24px rgba(0,0,0,.5);
+  --transition:.2s cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
+  max-width:480px;margin:0 auto;min-height:100vh;overflow-x:hidden;padding-bottom:calc(68px + env(safe-area-inset-bottom,0px))}
+
+/* ── SPLASH ──────────────────────────────────── */
+#splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease}
+.splash-hex{width:90px;height:90px;margin-bottom:20px;filter:drop-shadow(0 0 20px var(--blue-glow))}
+.splash-brand{font-size:11px;font-weight:800;letter-spacing:5px;color:var(--blue);text-transform:uppercase;margin-bottom:4px;opacity:0;animation:fadeUp .5s ease .3s forwards}
+.splash-main{font-size:28px;font-weight:900;color:var(--txt);letter-spacing:-1px;opacity:0;animation:fadeUp .5s ease .5s forwards}
+.splash-sub{font-size:12px;color:var(--txt2);margin-top:4px;margin-bottom:6px;opacity:0;animation:fadeUp .5s ease .65s forwards}
+.splash-athlete{font-size:14px;font-weight:700;color:var(--blue);opacity:0;animation:fadeUp .5s ease .8s forwards}
+.splash-goal{margin-top:10px;font-size:11px;font-weight:800;letter-spacing:3px;color:var(--gold);text-transform:uppercase;opacity:0;animation:fadeUp .5s ease .95s forwards}
+.splash-race{font-size:10px;color:var(--txt3);letter-spacing:2px;margin-top:4px;margin-bottom:28px;opacity:0;animation:fadeUp .5s ease 1.1s forwards}
+.splash-bar-wrap{width:160px;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.splash-bar{height:100%;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:2px;width:0%;transition:width 2.2s cubic-bezier(.4,0,.2,1) .5s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HEADER ──────────────────────────────────── */
+.header{background:linear-gradient(180deg,rgba(14,15,26,1) 0%,rgba(6,8,16,.95) 100%);
+  padding:14px 16px 10px;border-bottom:1px solid var(--bg4);position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.header-logo{display:flex;align-items:center;gap:10px}
+.header-logo svg{filter:drop-shadow(0 0 8px var(--blue-glow))}
+.header-title{font-size:14px;font-weight:900;color:var(--txt);letter-spacing:.3px}
+.header-sub{font-size:9px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-top:1px}
+.countdown-chip{background:linear-gradient(135deg,var(--bg3),var(--bg4));color:var(--blue);
+  font-size:13px;font-weight:900;padding:6px 12px;border-radius:20px;border:1px solid var(--bg5);
+  display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.countdown-label{font-size:8px;color:var(--txt3);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+
+/* ── MAIN ────────────────────────────────────── */
+main{padding:0}
+.tab-pane{display:none;padding:14px 14px 0;animation:fadeIn .2s ease}
+.tab-pane.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BOTTOM NAV ──────────────────────────────── */
+.nav-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+  background:rgba(14,15,26,.95);border-top:1px solid var(--bg4);
+  display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom,0px);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;
+  cursor:pointer;background:none;border:none;transition:var(--transition);position:relative;gap:3px}
+.nav-icon{font-size:20px;transition:transform .2s}
+.nav-label{font-size:9px;color:var(--txt3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;transition:color .2s}
+.nav-item.active .nav-label{color:var(--blue)}
+.nav-item.active .nav-icon{transform:scale(1.15);filter:drop-shadow(0 0 6px var(--blue))}
+.nav-item::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:0;height:2px;background:var(--blue);border-radius:0 0 3px 3px;transition:width .2s}
+.nav-item.active::after{width:28px}
+
+/* ── CARDS ───────────────────────────────────── */
+.card{background:var(--bg2);border-radius:var(--radius);padding:16px;margin-bottom:10px;
+  border:1px solid var(--bg4);box-shadow:var(--shadow)}
+.card-hd{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.card-ic{font-size:18px}
+.card-ttl{font-size:11px;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:1px}
+.card-ttl-lg{font-size:16px;font-weight:900;color:var(--txt);letter-spacing:-.3px}
+.card-accent{border:1px solid var(--blue-glow);background:linear-gradient(135deg,var(--bg2) 0%,rgba(33,150,243,.06) 100%)}
+
+/* ── BUTTONS ─────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  font-size:13px;font-weight:700;border:none;border-radius:12px;padding:11px 16px;cursor:pointer;transition:var(--transition)}
+.btn-primary{background:linear-gradient(135deg,#1976D2,var(--blue));color:#fff;box-shadow:0 4px 16px var(--blue-glow)}
+.btn-primary:active{transform:scale(.97)}
+.btn-ghost{background:var(--bg3);color:var(--blue);border:1px solid var(--bg5)}
+.btn-ghost:active{transform:scale(.97)}
+.btn-done{background:linear-gradient(135deg,#388E3C,var(--green)) !important;box-shadow:0 4px 16px rgba(76,175,80,.25) !important}
+.btn-danger{background:var(--bg3);color:var(--red);border:1px solid rgba(244,67,54,.2)}
+.btn-sm{font-size:11px;padding:7px 12px;border-radius:9px}
+.btn-full{width:100%;display:flex}
+.btn-row{display:flex;gap:8px}
+
+/* ── BADGES & PILLS ──────────────────────────── */
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:800;
+  padding:3px 10px;border-radius:20px;letter-spacing:.3px;text-transform:uppercase}
+.pill-blue{background:rgba(33,150,243,.15);color:var(--blue);border:1px solid rgba(33,150,243,.2)}
+.pill-orange{background:rgba(255,152,0,.15);color:var(--orange);border:1px solid rgba(255,152,0,.2)}
+.pill-red{background:rgba(244,67,54,.15);color:var(--red);border:1px solid rgba(244,67,54,.2)}
+.pill-green{background:rgba(76,175,80,.15);color:var(--green);border:1px solid rgba(76,175,80,.2)}
+.pill-purple{background:rgba(156,39,176,.15);color:var(--purple);border:1px solid rgba(156,39,176,.2)}
+.pill-gold{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.2)}
+.pill-teal{background:rgba(0,188,212,.15);color:var(--teal);border:1px solid rgba(0,188,212,.2)}
+.pill-grey{background:rgba(90,98,133,.15);color:var(--txt3);border:1px solid var(--bg5)}
+
+/* ── ALERTS ──────────────────────────────────── */
+.alert{border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:12px;line-height:1.6;display:flex;gap:10px;align-items:flex-start}
+.alert-ic{font-size:18px;flex-shrink:0;margin-top:1px}
+.alert-red{background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.2);color:#ef9a9a}
+.alert-orange{background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.2);color:#FFB74D}
+.alert-green{background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.2);color:#81C784}
+.alert-blue{background:rgba(33,150,243,.08);border:1px solid rgba(33,150,243,.2);color:#90CAF9}
+
+/* ── SESSION TYPE COLORS ─────────────────────── */
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;display:inline-block}
+.dot-z2,.pill-z2{background:#2196F3}
+.dot-umbral{background:#FF9800} .pill-umbral{background:rgba(255,152,0,.15);color:var(--orange);border:1px solid rgba(255,152,0,.2)}
+.dot-intervalos{background:#f44336}
+.dot-larga{background:#1565C0}
+.dot-fuerza{background:#4CAF50}
+.dot-hyrox{background:#9C27B0}
+.dot-simulacion{background:#6A1B9A}
+.dot-descanso{background:var(--bg5)}
+.dot-competencia{background:var(--gold)}
+.dot-recuperacion{background:var(--teal)}
+.dot-descarga{background:#607D8B}
+
+/* ── HOY TAB ─────────────────────────────────── */
+.today-hero{background:linear-gradient(135deg,var(--bg2) 0%,var(--bg3) 100%);
+  border-radius:var(--radius);padding:18px;margin-bottom:10px;border:1px solid var(--bg4);
+  position:relative;overflow:hidden}
+.today-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;
+  border-radius:50%;background:radial-gradient(circle,var(--blue-glow) 0%,transparent 70%);pointer-events:none}
+.today-date{font-size:11px;color:var(--txt3);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.today-sess-name{font-size:22px;font-weight:900;color:var(--txt);line-height:1.1;margin-bottom:8px}
+.today-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.today-dur{font-size:12px;color:var(--txt3);display:flex;align-items:center;gap:4px}
+.today-desc{font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:14px}
+.steps-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+.steps-list li{display:flex;gap:9px;font-size:12px;color:var(--txt2);line-height:1.5;align-items:flex-start}
+.step-n{width:20px;height:20px;border-radius:50%;background:var(--blue);color:#fff;
+  font-size:10px;font-weight:800;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.extra-note{background:rgba(33,150,243,.08);border-left:3px solid var(--blue);
+  border-radius:0 8px 8px 0;padding:9px 12px;font-size:12px;color:var(--blue2);margin-top:10px}
+
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.metric-card{background:var(--bg2);border:1px solid var(--bg4);border-radius:14px;padding:12px 8px;text-align:center}
+.metric-val{font-size:24px;font-weight:900;color:var(--blue);line-height:1}
+.metric-lbl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-top:4px;font-weight:600}
+
+/* ── CHECKLIST ───────────────────────────────── */
+.cl-progress{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.cl-bar-bg{flex:1;height:5px;background:var(--bg5);border-radius:3px;overflow:hidden}
+.cl-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:3px;transition:width .4s ease;width:0}
+.cl-pct{font-size:12px;font-weight:800;color:var(--blue);min-width:30px;text-align:right}
+.cl-list{display:flex;flex-direction:column}
+.cl-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bg4);cursor:pointer;transition:opacity .15s}
+.cl-item:last-child{border-bottom:none}
+.cl-item input{display:none}
+.cl-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--bg5);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--bg3)}
+.cl-item input:checked ~ .cl-box{background:var(--blue);border-color:var(--blue)}
+.cl-item input:checked ~ .cl-box::after{content:'✓';color:#fff;font-size:12px;font-weight:900}
+.cl-item input:checked ~ .cl-text{color:var(--txt3);text-decoration:line-through}
+.cl-text{font-size:13px;color:var(--txt);transition:color .15s}
+
+/* ── WEEK TAB ─────────────────────────────────── */
+.week-nav-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.week-title{font-size:20px;font-weight:900;color:var(--txt)}
+.week-btn{background:var(--bg3);border:1px solid var(--bg5);color:var(--blue);
+  border-radius:10px;padding:7px 14px;font-size:15px;cursor:pointer;transition:var(--transition)}
+.week-btn:active{background:var(--bg4)}
+.week-meta{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.week-dates{font-size:11px;color:var(--txt3)}
+
+.day-card{background:var(--bg2);border:1px solid var(--bg4);border-radius:14px;margin-bottom:7px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.day-card.today-card{border-color:rgba(33,150,243,.4);box-shadow:0 0 0 1px rgba(33,150,243,.1)}
+.day-card.done-card .day-top{opacity:.6}
+.day-card.rest-card{opacity:.55}
+.day-top{display:flex;align-items:center;padding:12px 14px;gap:10px}
+.day-name-col{flex:1}
+.day-name{font-size:13px;font-weight:700;color:var(--txt)}
+.day-date-sm{font-size:10px;color:var(--txt3);margin-top:2px}
+.day-sess-preview{font-size:12px;color:var(--txt2);padding:0 14px 11px;margin-top:-4px;line-height:1.3}
+.day-done-badge{font-size:10px;color:var(--green);font-weight:700}
+.day-expand-ic{color:var(--txt4);font-size:12px;transition:transform .2s}
+.day-detail{padding:0 14px 14px;border-top:1px solid var(--bg4);margin-top:4px}
+.day-detail-inner{padding-top:12px}
+.key-event{font-size:11px;font-weight:700;padding:4px 0 2px;margin-top:2px}
+.key-event.ev-race{color:var(--gold)} .key-event.ev-warn{color:var(--orange)}
+.key-event.ev-main{color:var(--green)} .key-event.ev-sim{color:var(--purple)}
+
+/* ── PLAN TAB ─────────────────────────────────── */
+.plan-hd{margin-bottom:16px}
+.plan-title{font-size:20px;font-weight:900;color:var(--txt)}
+.plan-sub{font-size:11px;color:var(--txt3);margin-top:3px}
+.phase-blk{margin-bottom:16px}
+.phase-hd{display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg3);border-radius:12px;padding:12px 14px;margin-bottom:7px;
+  border-left:4px solid var(--blue)}
+.phase-nm{font-size:13px;font-weight:800;color:var(--txt)}
+.phase-wks{font-size:10px;color:var(--txt3)}
+.phase-desc-txt{font-size:11px;color:var(--txt3);margin:0 2px 7px;padding-left:4px}
+.plan-week-row{background:var(--bg2);border:1px solid var(--bg4);border-radius:10px;
+  padding:10px 12px;margin-bottom:5px;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;gap:10px}
+.plan-week-row.curr-wk{border-color:rgba(33,150,243,.4);background:rgba(33,150,243,.04)}
+.pw-n{font-size:12px;font-weight:800;color:var(--blue);min-width:28px}
+.pw-dates{font-size:10px;color:var(--txt3);flex:1}
+.pw-prog{font-size:10px;color:var(--green);font-weight:700}
+.pw-event{font-size:9px;font-weight:800;padding:2px 0;margin-top:3px}
+
+/* ── SUBTABS ─────────────────────────────────── */
+.subtabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
+.subtabs::-webkit-scrollbar{display:none}
+.stab{background:var(--bg3);border:1px solid var(--bg5);color:var(--txt3);
+  border-radius:20px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:var(--transition)}
+.stab.active{background:rgba(33,150,243,.15);color:var(--blue);border-color:rgba(33,150,243,.3)}
+.spane{display:none} .spane.active{display:block}
+
+/* ── BITÁCORA ────────────────────────────────── */
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:10px;color:var(--txt3);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px}
+.fi{background:var(--bg3);color:var(--txt);font-size:14px;padding:11px 13px;
+  border-radius:11px;border:1px solid var(--bg5);width:100%;transition:border-color .2s;font-family:inherit}
+.fi:focus{outline:none;border-color:var(--blue)}
+.ftxt{background:var(--bg3);color:var(--txt);font-size:13px;padding:11px 13px;
+  border-radius:11px;border:1px solid var(--bg5);width:100%;min-height:80px;resize:vertical;font-family:inherit}
+.ftxt:focus{outline:none;border-color:var(--blue)}
+.slider-row{display:flex;align-items:center;gap:8px}
+.sl{-webkit-appearance:none;appearance:none;flex:1;height:5px;border-radius:3px;background:var(--bg5);outline:none}
+.sl::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--blue);cursor:pointer;box-shadow:0 0 0 3px rgba(33,150,243,.2)}
+.sl-val{font-size:14px;font-weight:800;color:var(--blue);min-width:24px;text-align:right}
+.mood-row{display:flex;gap:7px;flex-wrap:wrap}
+.mood-btn{background:var(--bg3);border:1px solid var(--bg5);color:var(--txt2);
+  border-radius:20px;padding:7px 13px;font-size:12px;cursor:pointer;transition:var(--transition)}
+.mood-btn.active{background:rgba(33,150,243,.15);color:var(--blue);border-color:rgba(33,150,243,.3)}
+.log-entry{background:var(--bg3);border-radius:12px;padding:12px;margin-bottom:7px;
+  border:1px solid var(--bg4);transition:var(--transition)}
+.log-date{font-size:11px;color:var(--blue);font-weight:700;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.log-stats{display:flex;gap:10px;flex-wrap:wrap}
+.log-stat{font-size:11px;color:var(--txt3)}
+.log-notes-txt{font-size:11px;color:var(--txt3);margin-top:6px;line-height:1.5;border-top:1px solid var(--bg4);padding-top:6px}
+.log-del{background:none;border:none;cursor:pointer;font-size:12px;color:var(--txt4);padding:0 4px}
+
+/* ── DASHBOARD / CHARTS ──────────────────────── */
+.filter-row{display:flex;gap:7px;margin-bottom:12px}
+.fbtn{background:var(--bg3);border:1px solid var(--bg5);color:var(--txt3);
+  border-radius:20px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:var(--transition)}
+.fbtn.active{background:rgba(33,150,243,.15);color:var(--blue);border-color:rgba(33,150,243,.3)}
+.chart-card{background:var(--bg2);border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid var(--bg4)}
+.chart-ttl{font-size:10px;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.chart-wrap{position:relative;height:150px}
+.no-data{text-align:center;padding:32px 16px;color:var(--txt3);font-size:13px;line-height:1.6}
+.no-data-ic{font-size:36px;margin-bottom:8px;display:block}
+
+/* ── KPIs ────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.kpi-box{background:var(--bg3);border-radius:12px;padding:11px}
+.kpi-lbl{font-size:10px;color:var(--txt3);margin-bottom:6px;font-weight:600}
+.kpi-inp{background:var(--bg);color:var(--blue);font-size:16px;font-weight:800;
+  padding:7px 9px;border-radius:8px;border:1px solid var(--bg5);width:100%;font-family:inherit;transition:border-color .2s}
+.kpi-inp:focus{outline:none;border-color:var(--blue)}
+
+/* ── ANÁLISIS ────────────────────────────────── */
+.an-card{background:var(--bg3);border-radius:12px;padding:13px;margin-bottom:8px;
+  display:flex;gap:10px;border-left:3px solid var(--blue)}
+.an-ic{font-size:22px;flex-shrink:0}
+.an-ttl{font-size:13px;font-weight:800;color:var(--txt);margin-bottom:3px}
+.an-txt{font-size:12px;color:var(--txt2);line-height:1.5}
+.rec-card{background:var(--bg3);border-radius:12px;padding:12px;margin-bottom:7px;
+  display:flex;gap:10px;border:1px solid var(--bg4)}
+.rec-ic{font-size:20px;flex-shrink:0}
+.rec-cat{font-size:11px;font-weight:800;color:var(--blue);display:block;margin-bottom:2px;text-transform:uppercase;letter-spacing:.4px}
+.rec-txt{font-size:12px;color:var(--txt2);line-height:1.5}
+
+/* ── VIDEOS ──────────────────────────────────── */
+.vfilt{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px}
+.vfilt::-webkit-scrollbar{display:none}
+.vid-item{background:var(--bg3);border-radius:12px;padding:12px;margin-bottom:7px;
+  display:flex;gap:12px;text-decoration:none;color:inherit;align-items:flex-start;
+  border:1px solid var(--bg4);transition:border-color .2s,transform .1s}
+.vid-item:active{transform:scale(.98)}
+.vid-thumb{width:58px;height:44px;background:var(--bg);border-radius:8px;
+  border:1px solid var(--bg5);flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.vid-play{font-size:20px;color:var(--blue);filter:drop-shadow(0 0 6px var(--blue-glow))}
+.vid-cat{position:absolute;bottom:2px;right:2px;font-size:7px;font-weight:800;
+  padding:1px 5px;border-radius:3px;text-transform:uppercase;color:#fff}
+.vid-cat.running{background:#1976D2} .vid-cat.hyrox{background:#7B1FA2}
+.vid-cat.fuerza{background:#388E3C} .vid-cat.tecnica{background:#E65100}
+.vid-cat.movilidad{background:#006064} .vid-cat.recuperacion{background:#37474F}
+.vid-info{flex:1;min-width:0}
+.vid-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px;line-height:1.3}
+.vid-ch{font-size:10px;color:var(--txt3)}
+.vid-link{font-size:10px;color:var(--blue);margin-top:3px;display:flex;align-items:center;gap:3px;font-weight:600}
+
+/* ── GARMIN ──────────────────────────────────── */
+.gz-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px}
+.gz-table th{background:var(--bg4);color:var(--txt3);font-weight:700;padding:8px 9px;
+  text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.gz-table td{padding:8px 9px;border-bottom:1px solid var(--bg4);color:var(--txt2)}
+.gz-table tr:last-child td{border-bottom:none}
+.zone-pill{font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;display:inline-block}
+.zone-pill.z1{background:rgba(90,98,133,.2);color:var(--txt3)}
+.zone-pill.z2{background:rgba(33,150,243,.2);color:var(--blue)}
+.zone-pill.z3{background:rgba(255,152,0,.2);color:var(--orange)}
+.zone-pill.z4{background:rgba(244,67,54,.2);color:var(--red)}
+.zone-pill.z5{background:rgba(156,39,176,.2);color:var(--purple)}
+.gz-steps{display:flex;flex-direction:column}
+.gz-step{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid var(--bg4)}
+.gz-step:last-child{border-bottom:none}
+.gz-step-n{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;
+  font-size:11px;font-weight:800;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.gz-step-body strong{font-size:13px;color:var(--txt);display:block;margin-bottom:2px}
+.gz-step-body p{font-size:12px;color:var(--txt3);margin:0}
+.gz-workout{background:var(--bg3);border-radius:12px;padding:13px;margin-bottom:8px;cursor:pointer;border:1px solid var(--bg4)}
+.gz-wk-hd{display:flex;justify-content:space-between;align-items:center}
+.gz-wk-nm{font-size:13px;font-weight:700;color:var(--txt)}
+.gz-wk-ic{color:var(--txt4);font-size:13px;transition:transform .2s}
+.gz-detail{display:none;margin-top:10px;border-top:1px solid var(--bg4);padding-top:10px}
+.gz-tip{background:rgba(33,150,243,.08);border-radius:8px;padding:9px 11px;font-size:11px;color:var(--blue2);margin-top:9px;border:1px solid rgba(33,150,243,.15)}
+
+/* ── MODAL ───────────────────────────────────── */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;
+  align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.modal-box{background:var(--bg2);border-radius:20px;padding:24px;width:100%;max-width:340px;border:1px solid var(--bg4);box-shadow:var(--shadow)}
+.modal-ttl{font-size:17px;font-weight:900;color:var(--txt);margin-bottom:6px}
+.modal-desc{font-size:12px;color:var(--txt2);margin-bottom:18px;line-height:1.5}
+.hrv-big{font-size:48px;font-weight:900;color:var(--blue);text-align:center;
+  margin:14px 0;text-shadow:0 0 30px var(--blue-glow)}
+.hrv-lbl{font-size:10px;color:var(--txt3);text-align:center;margin-top:-10px;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px}
+
+/* ── TOAST ───────────────────────────────────── */
+.toast{position:fixed;bottom:calc(74px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--bg3);color:var(--txt);padding:10px 20px;border-radius:20px;
+  font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:all .3s;
+  white-space:nowrap;z-index:999;border:1px solid var(--bg5);box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.t-green{background:rgba(76,175,80,.2);border-color:var(--green);color:var(--green)}
+.toast.t-red{background:rgba(244,67,54,.2);border-color:var(--red);color:var(--red)}
+
+/* ── SECTION DIVIDER ─────────────────────────── */
+.sec-lbl{font-size:10px;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;
+  padding:6px 2px 4px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bg4)}
+.section-text{font-size:13px;color:var(--txt2);margin-bottom:10px;line-height:1.5}
+.spacer{height:8px}
+</style>
+</head>
+<body>
+
+
+<!-- SPLASH -->
+<div id="splash">
+  <svg class="splash-hex" viewBox="0 0 100 115" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="50,4 96,28 96,88 50,111 4,88 4,28" fill="none" stroke="#2196F3" stroke-width="2.5"/>
+    <polygon points="50,18 82,36 82,79 50,97 18,79 18,36" fill="#2196F3" opacity="0.1"/>
+    <text x="50" y="59" text-anchor="middle" fill="#2196F3" font-size="20" font-weight="900" font-family="-apple-system,sans-serif">RMP</text>
+    <text x="50" y="74" text-anchor="middle" fill="#fff" font-size="8" font-family="-apple-system,sans-serif" opacity=".6">HYROX</text>
+  </svg>
+  <div class="splash-brand">Road My Plan</div>
+  <div class="splash-main">HYROX</div>
+  <div class="splash-sub">Performance System</div>
+  <div class="splash-athlete">Ezequiel Morisio</div>
+  <div class="splash-goal">🎯 SUB 60 MIN</div>
+  <div class="splash-race">Río de Janeiro · 20 Nov 2026</div>
+  <div class="splash-bar-wrap"><div class="splash-bar" id="splashBar"></div></div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-logo">
+      <svg viewBox="0 0 40 46" width="30" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="20,2 38,11 38,35 20,44 2,35 2,11" fill="none" stroke="#2196F3" stroke-width="2"/>
+        <text x="20" y="28" text-anchor="middle" fill="#2196F3" font-size="11" font-weight="900" font-family="-apple-system,sans-serif">RMP</text>
+      </svg>
+      <div><div class="header-title">ROAD MY PLAN</div><div class="header-sub">HYROX Performance</div></div>
+    </div>
+    <div class="countdown-chip" id="cntChip">
+      <span id="cntDays" style="font-size:18px;font-weight:900;color:#2196F3">--</span>
+      <span class="countdown-label">días · Río</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+
+<!-- ═══ TAB: HOY ════════════════════════════════ -->
+<div class="tab-pane active" id="pane-hoy">
+
+  <div style="height:12px"></div>
+
+  <!-- Hero Session Card -->
+  <div class="today-hero card-accent" id="heroCard">
+    <div class="today-date" id="todayDateLbl"></div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+      <div id="sessDot" class="dot" style="margin-top:6px"></div>
+      <div style="flex:1;margin:0 10px">
+        <div class="today-sess-name" id="sessName">Cargando...</div>
+        <div class="today-meta" id="sessMeta"></div>
+      </div>
+    </div>
+    <div class="today-desc" id="sessDesc"></div>
+    <ol class="steps-list" id="sessSteps"></ol>
+    <div id="sessExtraNote"></div>
+    <div class="spacer"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btnDone" onclick="markDone()" style="flex:1">✓ Completar sesión</button>
+      <button class="btn btn-ghost" onclick="openHRV()" style="padding:11px 14px">💓</button>
+    </div>
+  </div>
+
+  <!-- HRV Warning -->
+  <div class="alert alert-orange" id="hrvWarn" style="display:none">
+    <span class="alert-ic">⚠️</span>
+    <div>HRV bajo — Reducir intensidad o cambiar por Z1 recuperación</div>
+  </div>
+
+  <!-- Marathon Warning -->
+  <div class="alert alert-red" id="marathonWarn" style="display:none">
+    <span class="alert-ic">🚨</span>
+    <div><strong>MARATÓN — ESTÍMULO AERÓBICO SOLAMENTE</strong><br>5:30–5:45/km MAX · NO es competencia</div>
+  </div>
+
+  <!-- Metrics Row -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-val" id="mVO2">52</div>
+      <div class="metric-lbl">VO2max</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" id="mWeek">S1</div>
+      <div class="metric-lbl">Semana</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" id="mSess">0/6</div>
+      <div class="metric-lbl">Sesiones</div>
+    </div>
+  </div>
+
+  <!-- Checklist -->
+  <div class="card">
+    <div class="card-hd">
+      <span class="card-ic">✅</span>
+      <span class="card-ttl">Checklist Diario</span>
+      <div class="cl-pct" id="clPct" style="margin-left:auto">0%</div>
+    </div>
+    <div class="cl-progress">
+      <div class="cl-bar-bg"><div class="cl-bar-fill" id="clBar"></div></div>
+    </div>
+    <div class="cl-list" id="clList">
+      <label class="cl-item"><input type="checkbox" data-k="training" onchange="updateCL()"><div class="cl-box"></div><span class="cl-text">Entrenamiento completado</span></label>
+      <label class="cl-item"><input type="checkbox" data-k="run" onchange="updateCL()"><div class="cl-box"></div><span class="cl-text">Sesión de carrera</span></label>
+      <label class="cl-item"><input type="checkbox" data-k="strength" onchange="updateCL()"><div class="cl-box"></div><span class="cl-text">Fuerza / movilidad</span></label>
+      <label class="cl-item"><input type="checkbox" data-k="mobility" onchange="updateCL()"><div class="cl-box"></div><span class="cl-text">Movilidad 10+ min</span></label>
+      <label class="cl-item"><input type="checkbox" data-k="recovery" onchange="updateCL()"><div class="cl-box"></div><span class="cl-text">Recuperación activa</span></label>
+      <label class="cl-item"><input type="checkbox" data-k="sleep" onchange="updateCL()"><div class="cl-box"></div><span class="cl-text">Sueño 7.5h+ ayer</span></label>
+      <label class="cl-item"><input type="checkbox" data-k="nutrition" onchange="updateCL()"><div class="cl-box"></div><span class="cl-text">Nutrición según plan</span></label>
+      <label class="cl-item"><input type="checkbox" data-k="supps" onchange="updateCL()"><div class="cl-box"></div><span class="cl-text">Suplementación tomada</span></label>
+      <label class="cl-item"><input type="checkbox" data-k="garmin" onchange="updateCL()"><div class="cl-box"></div><span class="cl-text">Garmin revisado / HRV</span></label>
+    </div>
+  </div>
+
+</div><!-- /pane-hoy -->
+
+
+<!-- ═══ TAB: SEMANA ═════════════════════════════ -->
+<div class="tab-pane" id="pane-semana">
+  <div style="height:12px"></div>
+  <div class="week-nav-row">
+    <button class="week-btn" onclick="changeWeek(-1)">◀</button>
+    <div class="week-title" id="wkTitle">Semana 1</div>
+    <button class="week-btn" onclick="changeWeek(1)">▶</button>
+  </div>
+  <div class="week-meta">
+    <span class="pill pill-blue" id="wkPhasePill"></span>
+    <span class="week-dates" id="wkDates"></span>
+  </div>
+  <div id="wkDays"></div>
+</div>
+
+
+<!-- ═══ TAB: PLAN ════════════════════════════════ -->
+<div class="tab-pane" id="pane-plan">
+  <div style="height:12px"></div>
+  <div class="plan-hd">
+    <div class="plan-title">Plan 24 Semanas</div>
+    <div class="plan-sub">HYROX Río de Janeiro · 17 Jun → 20 Nov 2026</div>
+  </div>
+  <div id="planBody"></div>
+</div>
+
+
+<!-- ═══ TAB: DATOS ═══════════════════════════════ -->
+<div class="tab-pane" id="pane-datos">
+  <div style="height:12px"></div>
+  <div class="subtabs">
+    <button class="stab active" onclick="stab('datos','bitacora',this)">📓 Bitácora</button>
+    <button class="stab" onclick="stab('datos','dash',this)">📊 Dashboard</button>
+    <button class="stab" onclick="stab('datos','kpis',this)">🎯 KPIs</button>
+    <button class="stab" onclick="stab('datos','analisis',this)">🧠 Análisis</button>
+  </div>
+
+  <!-- BITÁCORA -->
+  <div class="spane active" id="d-bitacora">
+    <div class="card">
+      <div class="card-hd"><span class="card-ic">📓</span><span class="card-ttl">Nueva entrada</span></div>
+      <div class="fg"><label class="fl">Fecha</label><input type="date" class="fi" id="lDate"></div>
+      <div class="fg"><label class="fl">Energía <span id="vE">5</span>/10</label><div class="slider-row"><input type="range" min="1" max="10" value="5" class="sl" id="sE" oninput="sv('E')"><span class="sl-val" id="svE">5</span></div></div>
+      <div class="fg"><label class="fl">Motivación <span id="vM">5</span>/10</label><div class="slider-row"><input type="range" min="1" max="10" value="5" class="sl" id="sM" oninput="sv('M')"><span class="sl-val" id="svM">5</span></div></div>
+      <div class="fg"><label class="fl">Fatiga <span id="vF">3</span>/10</label><div class="slider-row"><input type="range" min="1" max="10" value="3" class="sl" id="sF" oninput="sv('F')"><span class="sl-val" id="svF">3</span></div></div>
+      <div class="fg"><label class="fl">Dolor <span id="vD">1</span>/10</label><div class="slider-row"><input type="range" min="1" max="10" value="1" class="sl" id="sD" oninput="sv('D')"><span class="sl-val" id="svD">1</span></div></div>
+      <div class="fg"><label class="fl">Estrés <span id="vS">3</span>/10</label><div class="slider-row"><input type="range" min="1" max="10" value="3" class="sl" id="sS" oninput="sv('S')"><span class="sl-val" id="svS">3</span></div></div>
+      <div class="fg"><label class="fl">HRV subjetivo <span id="vH">7</span>/10</label><div class="slider-row"><input type="range" min="1" max="10" value="7" class="sl" id="sH" oninput="sv('H')"><span class="sl-val" id="svH">7</span></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        <div class="fg" style="margin:0"><label class="fl">Sueño (h)</label><input type="number" class="fi" id="lSleep" min="3" max="12" step="0.5" placeholder="7.5"></div>
+        <div class="fg" style="margin:0"><label class="fl">Peso (kg)</label><input type="number" class="fi" id="lWeight" min="60" max="100" step="0.1" placeholder="76.5"></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Estado de ánimo</label>
+        <div class="mood-row">
+          <button class="mood-btn" onclick="setMood('😴','Cansado')" data-m="😴">😴 Cansado</button>
+          <button class="mood-btn" onclick="setMood('😐','Neutro')" data-m="😐">😐 Neutro</button>
+          <button class="mood-btn" onclick="setMood('💪','Bien')" data-m="💪">💪 Bien</button>
+          <button class="mood-btn active" onclick="setMood('🔥','Excelente')" data-m="🔥">🔥 Excelente</button>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Notas</label><textarea class="ftxt" id="lNotes" placeholder="¿Cómo fue? ¿Algo destacable?"></textarea></div>
+      <button class="btn btn-primary btn-full" onclick="saveLog()">💾 Guardar entrada</button>
+    </div>
+    <div class="card" id="logHistCard">
+      <div class="card-hd"><span class="card-ic">📋</span><span class="card-ttl">Historial</span></div>
+      <div id="logHist"></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="spane" id="d-dash">
+    <div class="filter-row">
+      <button class="fbtn active" onclick="setFilter('week',this)">7 días</button>
+      <button class="fbtn" onclick="setFilter('month',this)">30 días</button>
+      <button class="fbtn" onclick="setFilter('quarter',this)">90 días</button>
+    </div>
+    <div id="dashBody"></div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="spane" id="d-kpis">
+    <div class="sec-lbl">🏃 Running</div>
+    <div class="kpi-grid">
+      <div class="kpi-box"><div class="kpi-lbl">Pace 10K (min/km)</div><input class="kpi-inp" id="ki-pace10k" placeholder="4:45" onchange="saveKPI('pace10k',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">VO2max</div><input class="kpi-inp" type="number" id="ki-vo2max" placeholder="52" onchange="saveKPI('vo2max',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">FC Reposo (bpm)</div><input class="kpi-inp" type="number" id="ki-fcrest" placeholder="52" onchange="saveKPI('fcrest',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">Cadencia (ppm)</div><input class="kpi-inp" type="number" id="ki-cadence" placeholder="172" onchange="saveKPI('cadence',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">Pace HYROX (min/km)</div><input class="kpi-inp" id="ki-pacehyrox" placeholder="5:00" onchange="saveKPI('pacehyrox',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">Tiempo 1K (min:ss)</div><input class="kpi-inp" id="ki-time1k" placeholder="4:30" onchange="saveKPI('time1k',this.value)"></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="sec-lbl">⚡ Estaciones HYROX</div>
+    <div class="kpi-grid">
+      <div class="kpi-box"><div class="kpi-lbl">Ski Erg 1000m</div><input class="kpi-inp" id="ki-ski" placeholder="3:30" onchange="saveKPI('ski',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">Sled Push 50m (seg)</div><input class="kpi-inp" type="number" id="ki-sled-push" placeholder="45" onchange="saveKPI('sled-push',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">Sled Pull 50m (seg)</div><input class="kpi-inp" type="number" id="ki-sled-pull" placeholder="50" onchange="saveKPI('sled-pull',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">Burpee BJ 80m (seg)</div><input class="kpi-inp" type="number" id="ki-bbj" placeholder="180" onchange="saveKPI('bbj',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">Row 1000m</div><input class="kpi-inp" id="ki-row" placeholder="3:45" onchange="saveKPI('row',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">Farmers 200m (seg)</div><input class="kpi-inp" type="number" id="ki-farmers" placeholder="120" onchange="saveKPI('farmers',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">Sandbag 100m (seg)</div><input class="kpi-inp" type="number" id="ki-sandbag" placeholder="150" onchange="saveKPI('sandbag',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">Wall Balls 100 reps</div><input class="kpi-inp" id="ki-wallball" placeholder="6:00" onchange="saveKPI('wallball',this.value)"></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="sec-lbl">⚖️ Composición</div>
+    <div class="kpi-grid">
+      <div class="kpi-box"><div class="kpi-lbl">Peso (kg)</div><input class="kpi-inp" type="number" id="ki-weight" placeholder="77" step="0.1" onchange="saveKPI('weight',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">% Grasa corporal</div><input class="kpi-inp" type="number" id="ki-bodyfat" placeholder="18" step="0.5" onchange="saveKPI('bodyfat',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">HRV promedio (ms)</div><input class="kpi-inp" type="number" id="ki-hrv" placeholder="65" onchange="saveKPI('hrv',this.value)"></div>
+      <div class="kpi-box"><div class="kpi-lbl">Sueño prom. (h)</div><input class="kpi-inp" type="number" id="ki-sleep-avg" placeholder="7.5" step="0.5" onchange="saveKPI('sleep-avg',this.value)"></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-primary btn-full" onclick="saveAllKPIs()">💾 Guardar todos los KPIs</button>
+  </div>
+
+  <!-- ANÁLISIS -->
+  <div class="spane" id="d-analisis">
+    <div class="card">
+      <div class="card-hd"><span class="card-ic">🧠</span><span class="card-ttl">Análisis Inteligente</span></div>
+      <div id="analysisOut"><div class="no-data"><span class="no-data-ic">📊</span>Completá 5+ días en Bitácora para activar el análisis automático.</div></div>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost btn-full btn-sm" onclick="runAnalysis()">🔄 Actualizar análisis</button>
+    </div>
+    <div class="card">
+      <div class="card-hd"><span class="card-ic">💡</span><span class="card-ttl">Recomendaciones</span></div>
+      <div id="recomOut"><div class="no-data"><span class="no-data-ic">💡</span>Sin datos suficientes aún.</div></div>
+    </div>
+  </div>
+
+</div><!-- /pane-datos -->
+
+
+<!-- ═══ TAB: EXTRAS ══════════════════════════════ -->
+<div class="tab-pane" id="pane-extras">
+  <div style="height:12px"></div>
+  <div class="subtabs">
+    <button class="stab active" onclick="stab('extras','videos',this)">🎬 Videos</button>
+    <button class="stab" onclick="stab('extras','garmin',this)">⌚ Garmin</button>
+  </div>
+
+  <!-- VIDEOS -->
+  <div class="spane active" id="e-videos">
+    <div class="vfilt">
+      <button class="fbtn active" onclick="filterV('all',this)">Todos</button>
+      <button class="fbtn" onclick="filterV('running',this)">🏃 Running</button>
+      <button class="fbtn" onclick="filterV('hyrox',this)">⚡ HYROX</button>
+      <button class="fbtn" onclick="filterV('fuerza',this)">💪 Fuerza</button>
+      <button class="fbtn" onclick="filterV('tecnica',this)">🎯 Técnica</button>
+      <button class="fbtn" onclick="filterV('movilidad',this)">🧘 Movilidad</button>
+      <button class="fbtn" onclick="filterV('recuperacion',this)">💆 Recuperación</button>
+    </div>
+    <div id="videoBody"></div>
+  </div>
+
+  <!-- GARMIN -->
+  <div class="spane" id="e-garmin">
+    <div class="card">
+      <div class="card-hd"><span class="card-ic">❤️</span><span class="card-ttl">Zonas FC · Forerunner 265</span></div>
+      <div class="section-text">FC Max: <strong>179 bpm</strong> · Test Bruce confirmado</div>
+      <table class="gz-table">
+        <thead><tr><th>Zona</th><th>bpm</th><th>% FC Max</th><th>Tipo</th></tr></thead>
+        <tbody>
+          <tr><td><span class="zone-pill z1">Z1</span></td><td>&lt;116</td><td>&lt;65%</td><td>Recuperación</td></tr>
+          <tr><td><span class="zone-pill z2">Z2</span></td><td>116–134</td><td>65–75%</td><td>Base aeróbica</td></tr>
+          <tr><td><span class="zone-pill z3">Z3</span></td><td>134–147</td><td>75–82%</td><td>Aeróbico</td></tr>
+          <tr><td><span class="zone-pill z4">Z4</span></td><td>147–161</td><td>82–90%</td><td>Umbral lactato</td></tr>
+          <tr><td><span class="zone-pill z5">Z5</span></td><td>161–179</td><td>90–100%</td><td>VO2max</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="card-ic">🔧</span><span class="card-ttl">Configuración inicial FR265</span></div>
+      <div class="gz-steps">
+        <div class="gz-step"><div class="gz-step-n">1</div><div class="gz-step-body"><strong>Zonas FC personalizadas</strong><p>Menú → Configuración → Usuario → Zonas FC → Definidas por usuario</p></div></div>
+        <div class="gz-step"><div class="gz-step-n">2</div><div class="gz-step-body"><strong>Morning Report (HRV diario)</strong><p>Menú → Configuración → Sistema → Morning Report → Activar</p></div></div>
+        <div class="gz-step"><div class="gz-step-n">3</div><div class="gz-step-body"><strong>HRV Status en Garmin Connect</strong><p>Garmin Connect → Más → Health Stats → HRV Status → Verificar activo</p></div></div>
+        <div class="gz-step"><div class="gz-step-n">4</div><div class="gz-step-body"><strong>Cadencia en pantalla de datos</strong><p>Durante workout → Pantallas de datos → Añadir Cadencia (objetivo 180 ppm)</p></div></div>
+        <div class="gz-step"><div class="gz-step-n">5</div><div class="gz-step-body"><strong>Alertas de zona FC</strong><p>Durante workout → Alertas → FC → Zona. Configurar Z2 (116–134) para runs base</p></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="card-ic">📋</span><span class="card-ttl">Entrenamientos estructurados</span></div>
+      <div id="garminWks"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="card-ic">⚡</span><span class="card-ttl">Referencia rápida desde el reloj</span></div>
+      <table class="gz-table">
+        <thead><tr><th>Acción</th><th>Pasos en FR265</th></tr></thead>
+        <tbody>
+          <tr><td>Ver HRV</td><td>Widget → Deslizar → Estado HRV</td></tr>
+          <tr><td>Iniciar workout</td><td>Menú → Entrenamientos → Mis entrenamientos</td></tr>
+          <tr><td>Lap manual</td><td>Presionar LAP en cualquier momento</td></tr>
+          <tr><td>Pausar</td><td>START/STOP → BACK para reanudar</td></tr>
+          <tr><td>Ver ritmo promedio</td><td>Página de datos → Ritmo prom.</td></tr>
+          <tr><td>Cambiar zona FC</td><td>Alertas → FC → editar límites</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /pane-extras -->
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="nav-bar">
+  <button class="nav-item active" id="ni-hoy" onclick="goTab('hoy')"><span class="nav-icon">📅</span><span class="nav-label">HOY</span></button>
+  <button class="nav-item" id="ni-semana" onclick="goTab('semana')"><span class="nav-icon">📆</span><span class="nav-label">SEMANA</span></button>
+  <button class="nav-item" id="ni-plan" onclick="goTab('plan')"><span class="nav-icon">🗓</span><span class="nav-label">PLAN</span></button>
+  <button class="nav-item" id="ni-datos" onclick="goTab('datos')"><span class="nav-icon">📊</span><span class="nav-label">DATOS</span></button>
+  <button class="nav-item" id="ni-extras" onclick="goTab('extras')"><span class="nav-icon">⚙️</span><span class="nav-label">EXTRAS</span></button>
+</nav>
+
+<!-- HRV MODAL -->
+<div class="modal-ov" id="hrvModal" onclick="closeHRV()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-ttl">💓 Estado de recuperación</div>
+    <div class="modal-desc">¿Cómo te sentís hoy? 1 = agotado · 10 = excelente</div>
+    <input type="range" min="1" max="10" value="7" class="sl" style="width:100%" id="hrvSl" oninput="document.getElementById('hrvN').textContent=this.value">
+    <div class="hrv-big" id="hrvN">7</div>
+    <div class="hrv-lbl">/ 10</div>
+    <button class="btn btn-primary btn-full" style="margin-bottom:8px" onclick="saveHRV()">Guardar</button>
+    <button class="btn btn-ghost btn-full" onclick="closeHRV()">Cancelar</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ── CONSTANTS ──────────────────────────────────
+const PLAN_START = new Date('2026-06-17');
+const RACE_DATE  = new Date('2026-11-20');
+const TOTAL_WKS  = 24;
+const DAY_NAMES  = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+
+// ── PHASES ─────────────────────────────────────
+const PHASES = [
+  {num:1,name:'Base Aeróbica',wks:[1,6],color:'#2196F3',desc:'Z2 intensivo, técnica de carrera, fuerza, pérdida de peso'},
+  {num:2,name:'Umbral',wks:[7,12],color:'#FF9800',desc:'Umbral de lactato, intervalos, cadencia 180 ppm'},
+  {num:3,name:'Carreras Especiales',wks:[13,16],color:'#9C27B0',desc:'Media Maratón 23 Ago + Maratón 20 Sep (estímulo aeróbico)'},
+  {num:4,name:'HYROX Específico',wks:[17,20],color:'#E91E63',desc:'Simulaciones completas, ritmo de carrera, peak de forma'},
+  {num:5,name:'Taper + Peak',wks:[21,24],color:'#4CAF50',desc:'Volumen -40–50%, mantener intensidad, llegar fresco'},
+];
+
+// ── KEY DATES ───────────────────────────────────
+const KEY_DATES = {
+  '2026-08-23':{label:'Media Maratón Buenos Aires',type:'race',note:'Objetivo: 5:00–5:10/km · ~1h45–1h48'},
+  '2026-09-20':{label:'Maratón Buenos Aires',type:'warn',note:'🚨 ESTÍMULO AERÓBICO SOLAMENTE — 5:30–5:45/km MAX. NO es competencia.'},
+  '2026-10-20':{label:'Simulación HYROX #1',type:'sim',note:'Primera simulación completa · semana ~18'},
+  '2026-11-03':{label:'Simulación HYROX #2',type:'sim',note:'Última simulación antes de Río · semana ~20'},
+  '2026-11-20':{label:'🏆 HYROX RÍO DE JANEIRO',type:'main',note:'A RACE — OBJETIVO SUB 60 MIN'},
+};
+
+// ── SESSION LIBRARY ─────────────────────────────
+const SL = {
+  des:{type:'descanso',name:'Descanso Total',dur:'—',desc:'Recuperación completa. Sin entrenamiento planificado.',steps:[]},
+  rec:{type:'recuperacion',name:'Recuperación Activa Z1',dur:'20–30 min',desc:'Trote o caminata muy suave. FC <116 bpm. El objetivo es activar circulación, no entrenar.',steps:['Trote/caminata 20–30 min a Z1 (<116 bpm)','Ritmo completamente cómodo, podés hablar en frases largas','Foam rolling 10 min post sesión (cuádriceps, isquiotibiales, glúteos, pantorrillas)','Hidratación: 500ml agua durante la sesión']},
+
+  z2s:{type:'z2',name:'Z2 Corta',dur:'35–45 min',desc:'Carrera base aeróbica corta. FC 116–134 bpm.',steps:['Calentamiento 5 min caminata rápida','Correr 30–40 min Z2 (116–134 bpm)','Si FC sube a Z3: bajar ritmo o caminar 1–2 min hasta volver a zona','Cadencia objetivo: 175–178 ppm','Vuelta a la calma 5 min caminata']},
+  z2m:{type:'z2',name:'Z2 Base 50 min',dur:'50 min',desc:'Z2 estándar. Pilar de la base aeróbica.',steps:['Calentamiento 10 min Z1 (trote suave + caminata)','Correr 35 min Z2 estricto (116–134 bpm)','Si FC supera 134: reducir ritmo inmediatamente','Foco en cadencia 175–180 ppm y postura','Vuelta a la calma 5 min caminata suave']},
+  z2st:{type:'z2',name:'Z2 + Strides',dur:'55 min',desc:'Z2 moderado + aceleraciones de economía.',steps:['Calentamiento 10 min Z1','Z2 moderado 25 min (116–134 bpm)','8 × 80 m strides: acelerar progresivamente (no sprint total), caminata 60–90 seg entre cada uno','Foco en técnica durante strides: postura alta, rodilla frente, cadencia','Vuelta a la calma 10 min']},
+  eco:{type:'z2',name:'Economía + Strides',dur:'55 min',desc:'Drills de carrera + Z2 + strides.',steps:['Calentamiento 10 min Z1','Drills 10 min: A-Skip, B-Skip, High Knees, Butt Kicks, Carioca — 2×20 m cada uno','Z2 moderado 20 min (116–134 bpm) — foco cadencia 180 ppm','6 × 80–100 m strides (acelerar 70–85% máximo)','Recuperación 60–90 seg caminata entre strides','Vuelta a la calma 5 min']},
+
+  u3x2:{type:'umbral',name:'Umbral 3×2 km',dur:'55–65 min',desc:'Sesión de lactato. Intensidad Z4.',steps:['⚠️ ACTIVACIÓN LUMBAR PREVIA: Bird-Dog 2×10, Glute Bridge 2×15','Calentamiento 15 min Z1–Z2 + 4 strides','Intervalo 1: 2 km Z4 (147–161 bpm)','Recuperación: 90 segundos trote Z1','Intervalo 2: 2 km Z4','Recuperación: 90 segundos','Intervalo 3: 2 km Z4 — dar todo','Vuelta a la calma 10 min Z1 + estirar 5 min']},
+  u4x1:{type:'umbral',name:'Umbral 4×1 km',dur:'50 min',desc:'Umbral más corto, ritmo más rápido.',steps:['Calentamiento 10 min + 4 strides','4 × 1 km Z4 (147–161 bpm)','Recuperación 2 min trote suave entre cada uno','Mantener pace consistente las 4 repeticiones','Vuelta a la calma 8 min']},
+  tmp:{type:'umbral',name:'Tempo Run 25 min',dur:'45 min',desc:'Carrera continua al umbral de lactato.',steps:['Calentamiento 10 min Z1–Z2','25 min continuos Z3–Z4 (134–161 bpm)','Ritmo controlado, esfuerzo ~7/10','Vuelta a la calma 10 min']},
+
+  i6x8:{type:'intervalos',name:'Intervalos 6×800 m',dur:'55–65 min',desc:'VO2max. Esfuerzo alto, recuperación incompleta.',steps:['Calentamiento 15 min + drills de carrera','6 × 800 m Z4–Z5 (ritmo 10K)','Recuperación: 400 m trote suave entre reps','Mantener pace consistente — no explotar en la primera','Vuelta a la calma 10 min']},
+  i5x1:{type:'intervalos',name:'Intervalos 5×1 km',dur:'60 min',desc:'VO2max con reps más largas.',steps:['Calentamiento 15 min','5 × 1 km Z4–Z5','Recuperación 2 min entre reps','Últimas 2 reps al límite del esfuerzo','Vuelta a la calma 10 min']},
+  vo2:{type:'intervalos',name:'VO2max 8×400 m',dur:'50 min',desc:'Alta intensidad. Máximo esfuerzo por rep.',steps:['Calentamiento 10 min + drills','8 × 400 m Z5 (161+ bpm), ritmo 5K','Recuperación 90 s caminata entre reps','Explosivo: 400 m es corto, dar todo','Vuelta a la calma 8 min']},
+
+  lg70:{type:'larga',name:'Carrera Larga 70 min',dur:'70 min',desc:'Larga moderada. Base aeróbica extensa.',steps:['Calentamiento 10 min caminata rápida','60 min Z2 estricto (116–134 bpm)','Llevar hidratación (500 ml mínimo)','Si hace calor: reducir pace, priorizar zona','Vuelta a la calma 5 min caminata']},
+  lg90:{type:'larga',name:'Carrera Larga 90 min',dur:'90 min',desc:'Larga principal de la semana.',steps:['Calentamiento 10 min','75 min Z2 (116–134 bpm)','Nutrición: gel en km 45–50','Hidratación cada 20–25 min','Vuelta a la calma 5 min']},
+  lg110:{type:'larga',name:'Carrera Larga 110 min',dur:'110 min',desc:'Máxima larga de la fase base.',steps:['Calentamiento 10 min','95 min Z2–Z3 (116–147 bpm)','Nutrición: gel en km 45 y km 75','Monitorear fatiga — si baja el rendimiento: reducir','Vuelta a la calma 5 min']},
+
+  fa:{type:'fuerza',name:'Fuerza A — Tren Inferior',dur:'50–60 min',desc:'Cadena posterior, glúteos, core anti-lumbar.',steps:['⚠️ ACTIVACIÓN LUMBAR OBLIGATORIA: Bird-Dog 2×10, Glute Bridge 2×15, Pallof Press 2×10','Hip Thrust: 4×10–12 reps (carga progresiva)','RDL con mancuernas: 3×10 (cadena posterior)','Goblet Squat: 3×12 (movilidad + fuerza)','Step Up al banco: 3×10 cada pierna','Bulgarian Split Squat: 3×8 cada pierna','Nordic Curl excéntrico: 3×6 (prevención tendón)','Dead Bug: 3×8 cada lado','Pallof Press: 3×10 cada lado','Descanso entre series: 90–120 seg']},
+  fb:{type:'fuerza',name:'Fuerza B — Upper + HYROX',dur:'50–60 min',desc:'Upper body + movimientos HYROX específicos.',steps:['⚠️ ACTIVACIÓN LUMBAR OBLIGATORIA','Row con mancuernas: 4×10 (espalda alta)','Press mancuernas plano: 3×10','Face Pull: 3×15 (manguito rotador)','Farmer Carry: 4×30 m (carga máxima controlable)','Wall Ball: 3×15 reps (técnica HYROX)','Ski Erg drill: 3×20 jaladas (técnica)','Sled Push simulado: 3×20 m','Plank: 3×40–60 seg']},
+
+  htec:{type:'hyrox',name:'HYROX Técnica',dur:'60–75 min',desc:'Práctica de estaciones. Técnica sobre intensidad.',steps:['Calentamiento 10 min running Z1','Ski Erg 3×200 m técnica (doble jala completa, cadera atrás)','Farmers Carry 3×50 m (técnica de grip y postura)','Wall Ball 3×20 reps (profundidad + lanzamiento limpio)','Rowing 3×200 m técnica (drive con piernas, no brazos)','Burpee Broad Jump 2×10 reps (manos eficientes al suelo)','Descanso entre estaciones: 2–3 min']},
+  hbrick:{type:'hyrox',name:'Brick HYROX',dur:'60 min',desc:'Running + estaciones consecutivas. Simula la carrera.',steps:['Run 1 km ritmo HYROX (4:45–5:10/km)','Sin descanso: Ski Erg 500 m','Sin descanso: Run 1 km ritmo HYROX','Sin descanso: Wall Ball 50 reps','Sin descanso: Run 1 km','Sin descanso: Row 500 m','Registrar tiempos de cada bloque','Post: identificar punto débil del día']},
+  hsim:{type:'simulacion',name:'Simulación HYROX Completa',dur:'~60–75 min',desc:'Simulación completa de carrera. Máximo esfuerzo.',steps:['Calentamiento 15 min + activación general de estaciones','Run 1 km → Ski Erg 1000 m → Run 1 km → Sled Push 50 m (+20 kg)','Run 1 km → Sled Pull 50 m (+15 kg) → Run 1 km → Burpee Broad Jump 80 m','Run 1 km → Farmers Carry 200 m (2×14 kg) → Run 1 km → Sandbag Lunges 100 m (10 kg)','Run 1 km → Wall Ball 100 reps (6 kg/9 kg) → Run 1 km → Row 1000 m','Registrar split de cada km y cada estación','Post: análisis de puntos débiles y tiempos parciales']},
+
+  mm:{type:'competencia',name:'Media Maratón Buenos Aires',dur:'~1h45–1h48',desc:'A RACE. Objetivo: 5:00–5:10/km.',steps:['Ritual pre-carrera idéntico al de HYROX Río','Calentamiento 15 min + strides','Ritmo objetivo: 5:00–5:10/km constante','FC objetivo: Z3–Z4 (134–161 bpm)','Nutrición: gel en km 7 y km 14','Post: 2 días recuperación activa pura']},
+  mba:{type:'competencia',name:'Maratón Buenos Aires',dur:'~3h50–4h00',desc:'⚠️ NO competencia. Estímulo aeróbico solamente.',steps:['🚨 RECORDATORIO: ESTÍMULO AERÓBICO — NO CARRERA COMPETITIVA','Ritmo ESTRICTO: 5:30–5:45/km. Si vas más rápido: frenate.','FC objetivo: Z2–Z3 (116–147 bpm)','Nutrición: gel cada 8–10 km desde km 16','Hidratación: en todos los puestos','Prioridad #1: llegar al final sin lesiones para HYROX Río']},
+  hrio:{type:'competencia',name:'🏆 HYROX RÍO DE JANEIRO',dur:'SUB 60 MIN',desc:'El objetivo de toda la temporada. Darlo todo.',steps:['Ritual pre-carrera ejecutado exactamente como ensayado','Calentamiento 20 min + activación específica de estaciones','Ritmo carrera: 4:45–5:00/km — agresivo pero sostenible','Sé conservador en Ski Erg y Row (penaliza al final)','Mantener técnica en Burpees y Sandbag (no explotar)','Wall Ball al final: contar cada rep, nunca parar','Confiar en los 5 meses de preparación','Disfrutar cada km de la carrera']},
+
+  drun:{type:'descarga',name:'Carrera Descarga Z2',dur:'35 min',desc:'Semana de descarga. Volumen -40%. Sin presión.',steps:['Trote muy suave 35 min Z1–Z2','Sin objetivo de pace ni de zona','Escuchar el cuerpo — si no tenés ganas, caminá','Foam rolling post sesión']},
+};
+
+// ── 24-WEEK PLAN ────────────────────────────────
+// Each week = [Mon,Tue,Wed,Thu,Fri,Sat,Sun] — key from SL or {k,note}
+const PLAN = [
+  // F1: BASE AERÓBICA
+  ['rec','u4x1','z2st','eco','des','lg70','des'],
+  ['rec','u3x2','z2st','eco','des','lg70','des'],
+  ['fa','u4x1','z2m','htec','des','lg90','des'],
+  ['fa','i6x8','z2st','fb','des','lg90','des'],
+  ['fa','u3x2','z2st','hbrick','des','lg90','des'],
+  ['rec','drun','z2s','fb','des','lg70','des'],
+  // F2: UMBRAL
+  ['fa','u3x2','z2st','htec','des','lg90','des'],
+  ['fa','i5x1','z2st','fb','des','lg90','des'],
+  ['fa','u3x2','z2st','hbrick','des','lg110','des'],
+  ['fa','vo2','z2st','fb','des','lg110','des'],
+  ['fa','u3x2','z2st','hbrick','des','lg110','des'],
+  ['rec','drun','z2s','fb','des','lg70','des'],
+  // F3: SPECIAL RACES
+  ['fa','u4x1','z2st','eco','des',{k:'lg90',note:'Reducir a 80 min si hay cansancio'},'des'],
+  ['fa','tmp','z2m','fb','des',{k:'mm',note:'🎯 CARRERA: Media Maratón Buenos Aires 23 Ago'},'des'],
+  ['rec','rec','z2s','fb','des','lg70','des'],
+  ['fa','z2st','z2m','fb','des',{k:'mba',note:'🚨 MARATÓN: Estímulo aeróbico SOLAMENTE 5:30–5:45/km'},'des'],
+  // F4: HYROX ESPECÍFICO
+  ['rec','u3x2','z2st','htec','des','lg90','des'],
+  ['fa','i6x8','hbrick','fb','des',{k:'hsim',note:'🔥 Simulación HYROX #1 · ~20 Oct'},'des'],
+  ['rec','u3x2','z2st','hbrick','des','lg90','des'],
+  ['fa','i5x1','hbrick','fb','des',{k:'hsim',note:'🔥 Simulación HYROX #2 · ~3 Nov (ÚLTIMA ANTES DE RÍO)'},'des'],
+  // F5: TAPER + PEAK
+  ['rec','u3x2','z2s','fb','des','lg70','des'],
+  ['rec','vo2','z2s','eco','des','lg70','des'],
+  ['rec','u4x1','z2s','rec','des','drun','des'],
+  ['rec','z2s','rec','eco','des','rec',{k:'hrio',note:'🏆 HYROX RÍO DE JANEIRO · 20 Nov 2026 · SUB 60 MIN'}],
+];
+
+// ── VIDEOS ──────────────────────────────────────
+const VIDEOS = [
+  {cat:'running',title:'Técnica de carrera para HYROX',ch:'Running Clinic',url:'https://www.youtube.com/results?search_query=running+technique+hyrox+form'},
+  {cat:'running',title:'Economía de carrera — drills clave',ch:'Running Science',url:'https://www.youtube.com/results?search_query=running+economy+drills'},
+  {cat:'running',title:'Cómo mejorar cadencia a 180 ppm',ch:'Run Mechanics',url:'https://www.youtube.com/results?search_query=cadence+180+steps+per+minute+running'},
+  {cat:'running',title:'Entrenamiento Zona 2 — guía completa',ch:'Endurance Coach',url:'https://www.youtube.com/results?search_query=zone+2+training+guide+aerobic'},
+  {cat:'running',title:'Strides y su correcta ejecución',ch:'Athletics Weekly',url:'https://www.youtube.com/results?search_query=running+strides+technique+correct'},
+  {cat:'hyrox',title:'HYROX — guía completa de estaciones',ch:'HYROX Official',url:'https://www.youtube.com/results?search_query=hyrox+complete+guide+stations+race'},
+  {cat:'hyrox',title:'Ski Erg técnica perfecta',ch:'HYROX Performance',url:'https://www.youtube.com/results?search_query=ski+erg+technique+perfect+hyrox'},
+  {cat:'hyrox',title:'Sled Push & Pull — estrategia de ritmo',ch:'FunctionalFit',url:'https://www.youtube.com/results?search_query=sled+push+pull+pacing+strategy+hyrox'},
+  {cat:'hyrox',title:'Wall Balls 100 reps sin parar',ch:'CrossFit Endurance',url:'https://www.youtube.com/results?search_query=wall+ball+100+reps+unbroken+technique'},
+  {cat:'hyrox',title:'Burpee Broad Jump — eficiencia máxima',ch:'HYROX Tips',url:'https://www.youtube.com/results?search_query=burpee+broad+jump+efficient+technique+hyrox'},
+  {cat:'hyrox',title:'Sandbag Lunges — conservar energía',ch:'HYROX Prep',url:'https://www.youtube.com/results?search_query=sandbag+lunges+energy+conservation+hyrox'},
+  {cat:'hyrox',title:'Rowing 1000m — no explotar al final',ch:'Row2Win',url:'https://www.youtube.com/results?search_query=rowing+1000m+pacing+strategy+hyrox'},
+  {cat:'hyrox',title:'Estrategia de ritmo en HYROX — cómo distribuir',ch:'HYROX Strategy',url:'https://www.youtube.com/results?search_query=hyrox+race+pacing+strategy+sub+60'},
+  {cat:'fuerza',title:'Hip Thrust — ejecución perfecta',ch:'Strength Lab',url:'https://www.youtube.com/results?search_query=hip+thrust+perfect+form+glutes'},
+  {cat:'fuerza',title:'Romanian Deadlift (RDL) con mancuernas',ch:'Hypertrophy Coach',url:'https://www.youtube.com/results?search_query=romanian+deadlift+dumbbell+form'},
+  {cat:'fuerza',title:'Nordic Curl para corredores',ch:'PhysioRunner',url:'https://www.youtube.com/results?search_query=nordic+curl+runner+hamstring'},
+  {cat:'fuerza',title:'Bulgarian Split Squat para corredores',ch:'Athlete Academy',url:'https://www.youtube.com/results?search_query=bulgarian+split+squat+runner+performance'},
+  {cat:'fuerza',title:'Farmer Carry — variaciones para HYROX',ch:'StrongAthlete',url:'https://www.youtube.com/results?search_query=farmer+carry+variations+conditioning'},
+  {cat:'fuerza',title:'Dead Bug — core estabilizador',ch:'CoreMechanics',url:'https://www.youtube.com/results?search_query=dead+bug+exercise+core+correct'},
+  {cat:'tecnica',title:'Transiciones HYROX rápidas',ch:'HYROX Academy',url:'https://www.youtube.com/results?search_query=hyrox+transitions+fast+efficient'},
+  {cat:'tecnica',title:'Activación lumbar pre-entrenamiento',ch:'PhysioSport',url:'https://www.youtube.com/results?search_query=lumbar+activation+pre+workout+runner'},
+  {cat:'tecnica',title:'Warm-up running profesional 10 min',ch:'RunCoach Pro',url:'https://www.youtube.com/results?search_query=running+warm+up+professional+10+minutes'},
+  {cat:'tecnica',title:'Breathing technique para carrera',ch:'BreathePro',url:'https://www.youtube.com/results?search_query=breathing+technique+running+performance'},
+  {cat:'movilidad',title:'Movilidad de cadera para corredores',ch:'MobilityWOD',url:'https://www.youtube.com/results?search_query=hip+mobility+runners+routine'},
+  {cat:'movilidad',title:'Rutina de flexibilidad post-carrera',ch:'YogaRunner',url:'https://www.youtube.com/results?search_query=flexibility+routine+post+run+cool+down'},
+  {cat:'movilidad',title:'Tobillo y fascitis — prevención activa',ch:'RunPhysio',url:'https://www.youtube.com/results?search_query=ankle+mobility+plantar+fasciitis+prevention'},
+  {cat:'movilidad',title:'Apertura torácica para corredores',ch:'MobilityFirst',url:'https://www.youtube.com/results?search_query=thoracic+spine+mobility+runner'},
+  {cat:'recuperacion',title:'Foam rolling completo — post entreno',ch:'RecoveryPro',url:'https://www.youtube.com/results?search_query=foam+rolling+full+body+post+workout'},
+  {cat:'recuperacion',title:'HRV — qué es y cómo interpretarlo',ch:'ScienceOfSport',url:'https://www.youtube.com/results?search_query=heart+rate+variability+athletes+explained'},
+  {cat:'recuperacion',title:'Sueño y rendimiento deportivo',ch:'SleepOptimize',url:'https://www.youtube.com/results?search_query=sleep+athletic+performance+optimization'},
+  {cat:'recuperacion',title:'Protocolo de recuperación activa Z1',ch:'EnduranceCoach',url:'https://www.youtube.com/results?search_query=active+recovery+zone+1+protocol+running'},
+];
+
+// ── GARMIN WORKOUTS ─────────────────────────────
+const GZ_WKS = [
+  {name:'Z2 Base 50 min',steps:[
+    {p:'Calentamiento',d:'10 min',z:'z1',n:'<116 bpm, trote suave'},
+    {p:'Cuerpo principal',d:'35 min',z:'z2',n:'116–134 bpm. Ritmo conversacional. Cadencia ~175 ppm'},
+    {p:'Vuelta a la calma',d:'5 min',z:'z1',n:'Trotar hasta detener'},
+  ],tip:'Crear alerta de FC en 134 bpm para no salir de Z2'},
+  {name:'Carrera Larga Z2 90 min',steps:[
+    {p:'Calentamiento',d:'10 min',z:'z1',n:'Caminata rápida + trote suave'},
+    {p:'Cuerpo largo',d:'75 min',z:'z2',n:'116–134 bpm estricto. Si sube: bajar pace'},
+    {p:'Vuelta a la calma',d:'5 min',z:'z1',n:'Caminar'},
+  ],tip:'Llevar agua. Si hay calor: reducir pace, priorizar zona'},
+  {name:'Umbral 3×2 km',steps:[
+    {p:'Calentamiento',d:'15 min',z:'z1–z2',n:'Trote + 4 strides de 80 m'},
+    {p:'Intervalo 1 — 2 km',d:'~9 min',z:'z4',n:'147–161 bpm. Esfuerzo sostenido'},
+    {p:'Recuperación',d:'90 seg',z:'z1',n:'Trote MUY suave o caminar'},
+    {p:'Intervalo 2 — 2 km',d:'~9 min',z:'z4',n:'Mismo ritmo que rep 1'},
+    {p:'Recuperación',d:'90 seg',z:'z1',n:'Trote suave'},
+    {p:'Intervalo 3 — 2 km',d:'~9 min',z:'z4',n:'Dar todo'},
+    {p:'Vuelta a la calma',d:'10 min',z:'z1',n:'Trote suave + estirar'},
+  ],tip:'En Garmin Connect: Repeat 3× [2 km Z4 + 90 seg recuperación]'},
+  {name:'Intervalos 6×800 m',steps:[
+    {p:'Calentamiento',d:'15 min',z:'z1–z2',n:'Trote + drills'},
+    {p:'6 × 800 m',d:'~3:30–3:45 c/u',z:'z4–z5',n:'147–170 bpm. Ritmo 10K'},
+    {p:'Recuperación',d:'400 m trote',z:'z1',n:'Recuperación activa entre reps'},
+    {p:'Vuelta a la calma',d:'10 min',z:'z1',n:'Trote suave'},
+  ],tip:'Repeat 6× [800 m @ Z4–Z5 + 400 m Z1 recovery]'},
+  {name:'Ritmo HYROX 8×1 km',steps:[
+    {p:'Calentamiento',d:'15 min',z:'z1–z2',n:'Trote + activación'},
+    {p:'8 × 1 km',d:'~5 min c/u',z:'z3–z4',n:'Simula ritmo HYROX: 4:45–5:10/km'},
+    {p:'Recuperación',d:'60 seg exactos',z:'z1',n:'60 seg — simula transición HYROX'},
+    {p:'Vuelta a la calma',d:'10 min',z:'z1',n:'Trote muy suave'},
+  ],tip:'Repeat 8× [1 km @ 4:45–5:10/km + 60 seg Z1]. Alerta de pace'},
+  {name:'Umbral 4×1 km',steps:[
+    {p:'Calentamiento',d:'10 min',z:'z1–z2',n:'Trote + strides'},
+    {p:'4 × 1 km',d:'~4:20–4:30 c/u',z:'z4',n:'147–161 bpm. Ritmo umbral sostenido'},
+    {p:'Recuperación',d:'2 min',z:'z1',n:'Trote muy suave'},
+    {p:'Vuelta a la calma',d:'8 min',z:'z1',n:'Trote suave + estirar'},
+  ],tip:'Repeat 4× [1 km Z4 + 2 min Z1]'},
+  {name:'Economía + Strides 6×100 m',steps:[
+    {p:'Calentamiento',d:'15 min',z:'z1–z2',n:'Trote suave'},
+    {p:'Drills 10 min',d:'10 min',z:'z1',n:'A-Skip, B-Skip, High Knees, Butt Kicks, Carioca'},
+    {p:'Z2 moderado',d:'20 min',z:'z2',n:'116–134 bpm, cadencia foco'},
+    {p:'6×100 m strides',d:'~18 seg c/u',z:'z4–z5',n:'Aceleración progresiva. Recuperación 60–90 s caminata'},
+    {p:'Vuelta a la calma',d:'5 min',z:'z1',n:'Trote suave'},
+  ],tip:'Manual: después del Z2, usar LAP para 6 × 100 m'},
+];
+
+// ── STATE ───────────────────────────────────────
+let curWk   = 1;
+let curMood = {e:'🔥',l:'Excelente'};
+let cfilt   = 'week';
+let vfilt   = 'all';
+let charts  = {};
+</script>
+
+
+<script>
+// ── UTILS ───────────────────────────────────────
+const today  = ()=> new Date();
+const dkey   = d  => d.toISOString().slice(0,10);
+const addD   = (d,n)=>{ const r=new Date(d); r.setDate(r.getDate()+n); return r; };
+const wkNum  = d  =>{ const ms=d-PLAN_START; return Math.max(1,Math.min(TOTAL_WKS,Math.floor(ms/604800000)+1)); };
+const wkStart= wn => addD(PLAN_START,(wn-1)*7);
+const phase  = wn => PHASES.find(p=>wn>=p.wks[0]&&wn<=p.wks[1])||PHASES[0];
+const daysLeft = ()=> Math.ceil((RACE_DATE-today())/86400000);
+const fmtDate= d  => d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+const todayDayIdx = ()=>{ const d=today().getDay(); return d===0?6:d-1; };
+
+function getSess(wn,di){
+  const arr=PLAN[wn-1]; if(!arr) return SL.des;
+  const v=arr[di]; if(!v) return SL.des;
+  const key=typeof v==='object'?v.k:v;
+  const s=SL[key]||SL.des;
+  return typeof v==='object'?{...s,_note:v.note}:s;
+}
+
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type?' t-'+type:'');
+  setTimeout(()=>t.className='toast',3000);
+}
+
+function getTypePillClass(t){
+  const map={z2:'pill-blue',umbral:'pill-orange',intervalos:'pill-red',larga:'pill-blue',
+    fuerza:'pill-green',hyrox:'pill-purple',simulacion:'pill-purple',
+    descanso:'pill-grey',competencia:'pill-gold',recuperacion:'pill-teal',descarga:'pill-grey'};
+  return map[t]||'pill-grey';
+}
+
+// ── SPLASH ──────────────────────────────────────
+function hideSplash(){
+  const s=document.getElementById('splash');
+  if(s){s.style.opacity='0';setTimeout(()=>s.remove(),600);}
+}
+window.addEventListener('load',()=>{
+  const b=document.getElementById('splashBar');
+  if(b) setTimeout(()=>b.style.width='100%',80);
+  setTimeout(hideSplash,2800);
+  document.getElementById('splash').addEventListener('click',hideSplash);
+});
+
+// ── TABS ────────────────────────────────────────
+function goTab(id){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  document.getElementById('ni-'+id).classList.add('active');
+  if(id==='datos') renderDash();
+  if(id==='semana') renderWeek();
+  if(id==='plan') renderPlan();
+  if(id==='extras'){ renderVideos(); renderGarminWks(); }
+}
+
+function stab(group,name,btn){
+  document.querySelectorAll('#pane-'+group+' .spane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#pane-'+group+' .stab').forEach(b=>b.classList.remove('active'));
+
+  btn.classList.add('active');
+  // fallback for different ID patterns
+  ['d-'+name,'e-'+name].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.add('active'); });
+  if(name==='dash') renderDash();
+  if(name==='analisis') runAnalysis();
+  if(name==='kpis') loadKPIs();
+  if(name==='videos') renderVideos();
+  if(name==='garmin') renderGarminWks();
+}
+
+// ── HOY ─────────────────────────────────────────
+function renderHoy(){
+  const now = today();
+  const wn  = wkNum(now);
+  const di  = todayDayIdx();
+  const sess= getSess(wn,di);
+  const ph  = phase(wn);
+
+  // header countdown
+  document.getElementById('cntDays').textContent = daysLeft();
+
+  // date label
+  document.getElementById('todayDateLbl').textContent =
+    fmtDate(now).replace(/^\w/,c=>c.toUpperCase()) + ' · Fase '+ph.num+': '+ph.name;
+
+  // dot
+  const dot = document.getElementById('sessDot');
+  dot.className = 'dot dot-'+sess.type;
+
+  // session name
+  document.getElementById('sessName').textContent = sess.name;
+
+  // meta
+  let metaHTML = '<span class="pill '+getTypePillClass(sess.type)+'">'+sess.type.toUpperCase()+'</span>';
+  if(sess.dur&&sess.dur!=='—') metaHTML+=' <span style="font-size:12px;color:var(--txt3)">⏱ '+sess.dur+'</span>';
+  document.getElementById('sessMeta').innerHTML = metaHTML;
+
+  // desc
+  document.getElementById('sessDesc').textContent = sess.desc;
+
+  // steps
+  let stepsHTML = '';
+  if(sess.steps&&sess.steps.length){
+    stepsHTML = sess.steps.map((s,i)=>'<li><div class="step-n">'+(i+1)+'</div><span>'+s+'</span></li>').join('');
+  }
+  document.getElementById('sessSteps').innerHTML = stepsHTML;
+
+  // extra note
+  const en = document.getElementById('sessExtraNote');
+  en.innerHTML = sess._note ? '<div class="extra-note">📌 '+sess._note+'</div>' : '';
+
+  // marathon warning
+  document.getElementById('marathonWarn').style.display = (dkey(now)==='2026-09-20') ? 'flex' : 'none';
+
+  // done button
+  const dk = 'done_'+dkey(now);
+  const btn = document.getElementById('btnDone');
+  if(localStorage.getItem(dk)){
+    btn.textContent='✓ Sesión completada';btn.classList.add('btn-done');btn.disabled=true;
+  } else {
+    btn.textContent='✓ Completar sesión';btn.classList.remove('btn-done');btn.disabled=false;
+  }
+
+  // metrics
+  const kpis = getKPIs();
+  document.getElementById('mVO2').textContent = kpis.vo2max||'52';
+  document.getElementById('mWeek').textContent = 'S'+wn;
+  const done = wkDone(wn);
+  const total = PLAN[wn-1]?PLAN[wn-1].filter(s=>{ const k=typeof s==='object'?s.k:s; return k!=='des'; }).length:0;
+  document.getElementById('mSess').textContent = done+'/'+total;
+
+  // hrv warning
+  const hrv = parseInt(localStorage.getItem('hrv_today')||'7');
+  document.getElementById('hrvWarn').style.display = hrv<6?'flex':'none';
+
+  // checklist
+  loadCL();
+}
+
+function markDone(){
+  localStorage.setItem('done_'+dkey(today()),'1');
+  const btn=document.getElementById('btnDone');
+  btn.textContent='✓ Sesión completada';btn.classList.add('btn-done');btn.disabled=true;
+  toast('✓ Sesión registrada','green');
+  const wn=wkNum(today());
+  const done=wkDone(wn);
+  const total=PLAN[wn-1]?PLAN[wn-1].filter(s=>{ const k=typeof s==='object'?s.k:s; return k!=='des'; }).length:0;
+  document.getElementById('mSess').textContent=done+'/'+total;
+}
+
+function wkDone(wn){
+  const ws=wkStart(wn); let c=0;
+  for(let i=0;i<7;i++) if(localStorage.getItem('done_'+dkey(addD(ws,i)))) c++;
+  return c;
+}
+
+// ── HRV MODAL ───────────────────────────────────
+function openHRV(){ document.getElementById('hrvModal').style.display='flex'; }
+function closeHRV(){ document.getElementById('hrvModal').style.display='none'; }
+function saveHRV(){
+  const v=document.getElementById('hrvSl').value;
+  localStorage.setItem('hrv_today',v);
+  localStorage.setItem('hrv_date',dkey(today()));
+  document.getElementById('hrvWarn').style.display=parseInt(v)<6?'flex':'none';
+  closeHRV();
+  toast('💓 HRV guardado: '+v+'/10');
+}
+
+// ── CHECKLIST ────────────────────────────────────
+function updateCL(){
+  const items=document.querySelectorAll('#clList input');
+  let done=0; const data={};
+  items.forEach(cb=>{ if(cb.checked) done++; data[cb.dataset.k]=cb.checked?1:0; });
+  localStorage.setItem('cl_'+dkey(today()),JSON.stringify(data));
+  const pct=Math.round(done/items.length*100);
+  document.getElementById('clBar').style.width=pct+'%';
+  document.getElementById('clPct').textContent=pct+'%';
+}
+function loadCL(){
+  const data=JSON.parse(localStorage.getItem('cl_'+dkey(today()))||'{}');
+  const items=document.querySelectorAll('#clList input');
+  let done=0;
+  items.forEach(cb=>{ cb.checked=!!data[cb.dataset.k]; if(cb.checked) done++; });
+  const pct=Math.round(done/items.length*100);
+  document.getElementById('clBar').style.width=pct+'%';
+  document.getElementById('clPct').textContent=pct+'%';
+}
+
+// ── WEEK VIEW ────────────────────────────────────
+function changeWeek(d){ curWk=Math.max(1,Math.min(TOTAL_WKS,curWk+d)); renderWeek(); }
+
+function renderWeek(){
+  const wn=curWk; const ph=phase(wn);
+  const ws=wkStart(wn); const we=addD(ws,6);
+  document.getElementById('wkTitle').textContent='Semana '+wn;
+  document.getElementById('wkPhasePill').textContent='Fase '+ph.num+': '+ph.name;
+  document.getElementById('wkPhasePill').style.background=ph.color+'22';
+  document.getElementById('wkPhasePill').style.color=ph.color;
+  document.getElementById('wkDates').textContent=
+    ws.toLocaleDateString('es-AR',{day:'numeric',month:'short'})+' – '+
+    we.toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'});
+
+  let html='';
+  for(let i=0;i<7;i++){
+    const sess=getSess(wn,i);
+    const d=addD(ws,i);
+    const isToday=dkey(d)===dkey(today());
+    const isDone=!!localStorage.getItem('done_'+dkey(d));
+    const ke=KEY_DATES[dkey(d)];
+    const cls=['day-card',isToday?'today-card':'',isDone?'done-card':'',sess.type==='descanso'?'rest-card':''].filter(Boolean).join(' ');
+
+    html+='<div class="'+cls+'" onclick="toggleDay(\'dd-'+i+'\')">';
+    html+='<div class="day-top">';
+    html+='<div class="dot dot-'+sess.type+'"></div>';
+    html+='<div class="day-name-col"><div class="day-name">'+DAY_NAMES[i]+(isToday?' <span style="font-size:9px;color:var(--blue);font-weight:800;">HOY</span>':'')+'</div><div class="day-date-sm">'+d.toLocaleDateString('es-AR',{day:'numeric',month:'short'})+'</div></div>';
+    html+='<div style="margin-left:auto;display:flex;align-items:center;gap:8px">';
+    if(isDone) html+='<span class="day-done-badge">✓</span>';
+    html+='<span id="dda-'+i+'" style="color:var(--txt4);font-size:12px;transition:transform .2s">▼</span>';
+    html+='</div></div>';
+    html+='<div class="day-sess-preview"><span class="pill '+getTypePillClass(sess.type)+'" style="font-size:9px;padding:2px 7px">'+sess.type.toUpperCase()+'</span> '+sess.name+'</div>';
+    if(ke) html+='<div class="key-event ev-'+ke.type+'" style="padding:0 14px 10px;margin-top:-4px">📍 '+ke.label+'</div>';
+    html+='<div class="day-detail" id="dd-'+i+'" style="display:none"><div class="day-detail-inner">';
+    html+='<p style="font-size:12px;color:var(--txt2);margin-bottom:10px;line-height:1.5">'+sess.desc+'</p>';
+    if(sess.steps&&sess.steps.length) html+='<ol class="steps-list">'+sess.steps.map((s,n)=>'<li><div class="step-n">'+(n+1)+'</div><span>'+s+'</span></li>').join('')+'</ol>';
+    if(sess._note) html+='<div class="extra-note" style="margin-top:10px">📌 '+sess._note+'</div>';
+    if(ke) html+='<div class="alert alert-'+(ke.type==='warn'?'orange':ke.type==='main'?'green':ke.type==='sim'?'blue':'green')+'" style="margin-top:10px"><span class="alert-ic">'+(ke.type==='warn'?'⚠️':ke.type==='main'?'🏆':'🎯')+'</span><div>'+ke.note+'</div></div>';
+    html+='</div></div></div>';
+  }
+  document.getElementById('wkDays').innerHTML=html;
+}
+
+function toggleDay(id){
+  const el=document.getElementById(id);
+  const idx=id.replace('dd-','');
+  const arr=document.getElementById('dda-'+idx);
+  const vis=el.style.display!=='none';
+  el.style.display=vis?'none':'block';
+  if(arr) arr.style.transform=vis?'':'rotate(180deg)';
+}
+
+// ── PLAN VIEW ────────────────────────────────────
+function renderPlan(){
+  let html='';
+  PHASES.forEach(ph=>{
+    html+='<div class="phase-blk">';
+    html+='<div class="phase-hd" style="border-left-color:'+ph.color+'">';
+    html+='<span class="phase-nm">Fase '+ph.num+': '+ph.name+'</span>';
+    html+='<span class="phase-wks">S'+ph.wks[0]+'–S'+ph.wks[1]+'</span></div>';
+    html+='<div class="phase-desc-txt">'+ph.desc+'</div>';
+
+    for(let wn=ph.wks[0];wn<=ph.wks[1];wn++){
+      const ws=wkStart(wn); const we=addD(ws,6);
+      const isCurr=wn===wkNum(today());
+      const done=wkDone(wn);
+      const total=PLAN[wn-1]?PLAN[wn-1].filter(s=>{ const k=typeof s==='object'?s.k:s; return k!=='des'; }).length:0;
+      html+='<div class="plan-week-row'+(isCurr?' curr-wk':'')+'" onclick="jumpWeek('+wn+')">';
+      html+='<span class="pw-n">S'+wn+(isCurr?' ←':''  )+'</span>';
+      html+='<span class="pw-dates">'+ws.toLocaleDateString('es-AR',{day:'numeric',month:'short'})+' – '+we.toLocaleDateString('es-AR',{day:'numeric',month:'short'})+'</span>';
+      html+='<span class="pw-prog">'+done+'/'+total+' ✓</span>';
+      // key events in this week
+      for(let i=0;i<7;i++){
+        const dk2=dkey(addD(ws,i));
+        if(KEY_DATES[dk2]){
+          const ke=KEY_DATES[dk2];
+          html+='<div class="pw-event" style="width:100%;color:'+(ke.type==='warn'?'var(--orange)':ke.type==='main'?'var(--green)':ke.type==='sim'?'var(--purple)':'var(--gold)')+'">📍 '+ke.label+'</div>';
+        }
+      }
+      html+='</div>';
+    }
+    html+='</div>';
+  });
+  document.getElementById('planBody').innerHTML=html;
+}
+
+function jumpWeek(wn){ curWk=wn; goTab('semana'); }
+
+// ── BITÁCORA ─────────────────────────────────────
+function sv(k){ const v=document.getElementById('s'+k).value; document.getElementById('sv'+k).textContent=v; }
+function setMood(e,l){ curMood={e,l}; document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active')); document.querySelector('[data-m="'+e+'"]').classList.add('active'); }
+
+function saveLog(){
+  const date=document.getElementById('lDate').value;
+  if(!date){ toast('Seleccioná una fecha','red'); return; }
+  const entry={date,
+    E:+document.getElementById('sE').value,
+    M:+document.getElementById('sM').value,
+    F:+document.getElementById('sF').value,
+    D:+document.getElementById('sD').value,
+    S:+document.getElementById('sS').value,
+    H:+document.getElementById('sH').value,
+    sleep:+document.getElementById('lSleep').value||0,
+    weight:+document.getElementById('lWeight').value||0,
+    mood:curMood.e, moodL:curMood.l,
+    notes:document.getElementById('lNotes').value};
+  const logs=getLogs();
+  const idx=logs.findIndex(l=>l.date===date);
+  if(idx>=0) logs[idx]=entry; else logs.push(entry);
+  logs.sort((a,b)=>a.date>b.date?-1:1);
+  localStorage.setItem('hyrox_logs',JSON.stringify(logs));
+  renderLogHist();
+  toast('📓 Entrada guardada','green');
+}
+
+function getLogs(){ return JSON.parse(localStorage.getItem('hyrox_logs')||'[]'); }
+
+function renderLogHist(){
+  const logs=getLogs().slice(0,30);
+  if(!logs.length){ document.getElementById('logHist').innerHTML='<div class="no-data"><span class="no-data-ic">📋</span>Sin entradas aún. Empezá hoy.</div>'; return; }
+  document.getElementById('logHist').innerHTML=logs.map((l,i)=>`
+    <div class="log-entry">
+      <div class="log-date">${l.date} ${l.mood} <span class="pill pill-grey" style="font-size:9px">${l.moodL||''}</span>
+        <button class="log-del" onclick="delLog(${i})">🗑</button></div>
+      <div class="log-stats">
+        <span class="log-stat">⚡${l.E}</span><span class="log-stat">🎯${l.M}</span>
+        <span class="log-stat">😤${l.F}</span>${l.sleep?'<span class="log-stat">💤'+l.sleep+'h</span>':''}${l.weight?'<span class="log-stat">⚖️'+l.weight+'kg</span>':''}
+      </div>${l.notes?'<div class="log-notes-txt">'+l.notes+'</div>':''}
+    </div>`).join('');
+}
+
+function delLog(i){
+  const logs=getLogs(); logs.sort((a,b)=>a.date>b.date?-1:1);
+  logs.splice(i,1); localStorage.setItem('hyrox_logs',JSON.stringify(logs));
+  renderLogHist(); toast('Entrada eliminada');
+}
+
+// ── DASHBOARD ────────────────────────────────────
+function setFilter(f,btn){ cfilt=f; document.querySelectorAll('.filter-row .fbtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderDash(); }
+
+function getFilteredLogs(){
+  const logs=getLogs().slice().sort((a,b)=>a.date<b.date?-1:1);
+  if(!logs.length) return [];
+  const now=today(); let cut;
+  if(cfilt==='week') cut=new Date(now-7*86400000);
+  else if(cfilt==='month') cut=new Date(now-30*86400000);
+  else cut=new Date(now-90*86400000);
+  return logs.filter(l=>new Date(l.date)>=cut);
+}
+
+const CHART_CFG = {
+  responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y}}},
+  scales:{
+    x:{ticks:{color:'#5A6285',font:{size:9}},grid:{color:'#141525'},border:{color:'#1c1d2e'}},
+    y:{ticks:{color:'#5A6285',font:{size:9}},grid:{color:'#141525'},border:{color:'#1c1d2e'}}
+  }
+};
+
+function mkLine(ctx,labels,data,color,id){
+  if(charts[id]) charts[id].destroy();
+  charts[id]=new Chart(ctx,{type:'line',data:{labels,datasets:[{data,borderColor:color,backgroundColor:color+'18',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:color,pointBorderColor:'transparent'}]},options:CHART_CFG});
+}
+
+function mkBar(ctx,labels,data,color,id){
+  if(charts[id]) charts[id].destroy();
+  charts[id]=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data,backgroundColor:color+'44',borderColor:color,borderWidth:2,borderRadius:5}]},options:CHART_CFG});
+}
+
+function renderDash(){
+  const logs=getFilteredLogs();
+  const body=document.getElementById('dashBody');
+  if(logs.length<2){ body.innerHTML='<div class="no-data"><span class="no-data-ic">📊</span>Completá al menos 3 entradas en Bitácora para ver los gráficos.</div>'; return; }
+  const labels=logs.map(l=>l.date.slice(5));
+  body.innerHTML=`
+    <div class="chart-card"><div class="chart-ttl">Peso (kg)</div><div class="chart-wrap"><canvas id="cwt"></canvas></div></div>
+    <div class="chart-card"><div class="chart-ttl">Sueño (horas)</div><div class="chart-wrap"><canvas id="csl"></canvas></div></div>
+    <div class="chart-card"><div class="chart-ttl">Energía (1–10)</div><div class="chart-wrap"><canvas id="cen"></canvas></div></div>
+    <div class="chart-card"><div class="chart-ttl">Fatiga muscular (1–10)</div><div class="chart-wrap"><canvas id="cfa"></canvas></div></div>
+    <div class="chart-card"><div class="chart-ttl">HRV subjetivo (1–10)</div><div class="chart-wrap"><canvas id="chr"></canvas></div></div>`;
+  setTimeout(()=>{
+    if(logs.filter(l=>l.weight).length>1) mkLine(document.getElementById('cwt').getContext('2d'),labels,logs.map(l=>l.weight||null),'#2196F3','cwt');
+    mkLine(document.getElementById('csl').getContext('2d'),labels,logs.map(l=>l.sleep||null),'#4CAF50','csl');
+    mkLine(document.getElementById('cen').getContext('2d'),labels,logs.map(l=>l.E||null),'#FF9800','cen');
+    mkLine(document.getElementById('cfa').getContext('2d'),labels,logs.map(l=>l.F||null),'#f44336','cfa');
+    mkLine(document.getElementById('chr').getContext('2d'),labels,logs.map(l=>l.H||null),'#9C27B0','chr');
+  },50);
+}
+
+// ── KPIs ─────────────────────────────────────────
+function getKPIs(){ return JSON.parse(localStorage.getItem('hyrox_kpis')||'{}'); }
+function saveKPI(k,v){ const kpis=getKPIs(); kpis[k]=v; localStorage.setItem('hyrox_kpis',JSON.stringify(kpis)); }
+function loadKPIs(){ const kpis=getKPIs(); Object.keys(kpis).forEach(k=>{ const el=document.getElementById('ki-'+k); if(el) el.value=kpis[k]; }); }
+function saveAllKPIs(){ document.querySelectorAll('.kpi-inp').forEach(el=>{ if(el.value) saveKPI(el.id.replace('ki-',''),el.value); }); toast('🎯 KPIs guardados','green'); }
+
+// ── ANALYSIS ENGINE ───────────────────────────────
+function runAnalysis(){
+  const logs=getLogs().slice().sort((a,b)=>a.date<b.date?-1:1);
+  const out=document.getElementById('analysisOut');
+  const rec=document.getElementById('recomOut');
+  if(logs.length<5){
+    out.innerHTML='<div class="no-data"><span class="no-data-ic">📊</span>Completá 5+ días en Bitácora.</div>';
+    rec.innerHTML='<div class="no-data"><span class="no-data-ic">💡</span>Sin datos suficientes.</div>';
+    return;
+  }
+  const r=logs.slice(-7); const o=logs.slice(-14,-7);
+  const avg=(arr,f)=>{ const v=arr.map(l=>l[f]).filter(v=>v>0); return v.length?v.reduce((a,b)=>a+b)/v.length:0; };
+  const aF=avg(r,'F'),aE=avg(r,'E'),aH=avg(r,'H'),aS=avg(r,'sleep'),aD=avg(r,'D'),aSt=avg(r,'S');
+  const pE=avg(o,'E'),pH=avg(o,'H');
+  const ws=logs.filter(l=>l.weight>0);
+  let wTrend=null;
+  if(ws.length>=3){ const f3=avg(ws.slice(0,3),'weight'),l3=avg(ws.slice(-3),'weight'); wTrend=l3-f3; }
+
+  const findings=[];
+  if(aF>=7.5) findings.push({ic:'🔴',t:'Fatiga crítica',tx:'Fatiga en '+aF.toFixed(1)+'/10. Riesgo sobreentrenamiento. Semana de descarga.',left:'#f44336'});
+  else if(aF>=6) findings.push({ic:'🟡',t:'Fatiga acumulada',tx:'Fatiga en '+aF.toFixed(1)+'/10. Monitorear. Priorizar sueño.',left:'#FF9800'});
+  else findings.push({ic:'🟢',t:'Fatiga controlada',tx:'Fatiga en '+aF.toFixed(1)+'/10. Carga bien gestionada.',left:'#4CAF50'});
+
+  if(aH<5) findings.push({ic:'🔴',t:'HRV bajo',tx:'HRV subjetivo '+aH.toFixed(1)+'/10. SNC bajo estrés. Solo Z1–Z2.',left:'#f44336'});
+  else if(aH>=7.5) findings.push({ic:'🟢',t:'HRV óptimo',tx:'HRV en '+aH.toFixed(1)+'/10. Podés tolerar alta intensidad.',left:'#4CAF50'});
+
+  if(aS<6.5) findings.push({ic:'🔴',t:'Sueño insuficiente',tx:'Promedio '+aS.toFixed(1)+'h. Mínimo: 7.5h. El sueño es el suplemento #1.',left:'#f44336'});
+  else if(aS>=7.5) findings.push({ic:'🟢',t:'Sueño adecuado',tx:'Promedio '+aS.toFixed(1)+'h. Excelente para recuperación.',left:'#4CAF50'});
+
+  if(aD>=5) findings.push({ic:'🔴',t:'Dolor elevado',tx:'Dolor en '+aD.toFixed(1)+'/10. Consultar fisioterapeuta.',left:'#f44336'});
+  else if(aD>=3) findings.push({ic:'🟡',t:'Molestias presentes',tx:'Dolor en '+aD.toFixed(1)+'/10. Foam rolling y movilidad específica.',left:'#FF9800'});
+
+  if(aE<5) findings.push({ic:'🟡',t:'Energía baja',tx:'Energía en '+aE.toFixed(1)+'/10. Revisar nutrición y sueño.',left:'#FF9800'});
+  else if(aE>=7.5&&aE>pE) findings.push({ic:'🟢',t:'Energía en alza',tx:'Energía mejoró de '+pE.toFixed(1)+' a '+aE.toFixed(1)+'. Buena señal.',left:'#4CAF50'});
+
+  if(wTrend!==null){
+    if(wTrend<-0.5) findings.push({ic:'🟢',t:'Peso en descenso',tx:'Tendencia: '+wTrend.toFixed(1)+' kg. Progresando hacia 72–74 kg.',left:'#4CAF50'});
+    else if(wTrend>0.5) findings.push({ic:'🟡',t:'Peso en aumento',tx:'Tendencia: +'+wTrend.toFixed(1)+' kg. Revisar balance calórico.',left:'#FF9800'});
+  }
+
+  out.innerHTML=findings.map(f=>`<div class="an-card" style="border-left-color:${f.left}"><div class="an-ic">${f.ic}</div><div><div class="an-ttl">${f.t}</div><div class="an-txt">${f.tx}</div></div></div>`).join('');
+
+  const recoms=[];
+  if(aF>=7) recoms.push({ic:'💤',cat:'Recuperación',tx:'Reducir volumen 20–30% esta semana. Solo Z1. Dormir 8h+.'});
+  if(aS<7) recoms.push({ic:'😴',cat:'Sueño',tx:'Acostarte 30 min antes. Apagar pantallas 60 min antes. Habitación 18–20°C.'});
+  if(aD>=4) recoms.push({ic:'🏥',cat:'Lesión',tx:'Si dolor persiste 3+ días: fisioterapeuta. Activar protocolo lumbar antes de fuerza.'});
+  if(aE<5) recoms.push({ic:'🥗',cat:'Nutrición',tx:'Aumentar carbohidratos en días intensos. Proteína objetivo: '+(77*1.8).toFixed(0)+' g/día.'});
+  if(aSt>=7) recoms.push({ic:'🧘',cat:'Estrés',tx:'10 min respiración diafragmática pre-sueño. El cortisol elevado bloquea la adaptación.'});
+  if(aH<5) recoms.push({ic:'⚡',cat:'Carga',tx:'No iniciar sesiones Z4+ hasta HRV > 6. Mantener Z1–Z2 solamente.'});
+  if(!recoms.length) recoms.push({ic:'✅',cat:'Estado óptimo',tx:'Todos los parámetros en rango. Mantener constancia y registrar diariamente.'});
+  rec.innerHTML=recoms.map(r=>`<div class="rec-card"><div class="rec-ic">${r.ic}</div><div><span class="rec-cat">${r.cat}</span><span class="rec-txt">${r.tx}</span></div></div>`).join('');
+}
+
+// ── VIDEOS ───────────────────────────────────────
+function filterV(cat,btn){
+  vfilt=cat;
+  document.querySelectorAll('.vfilt .fbtn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderVideos();
+}
+function renderVideos(){
+  const filtered=vfilt==='all'?VIDEOS:VIDEOS.filter(v=>v.cat===vfilt);
+  document.getElementById('videoBody').innerHTML=filtered.map(v=>`
+    <a class="vid-item" href="${v.url}" target="_blank" rel="noopener">
+      <div class="vid-thumb"><div class="vid-play">▶</div><span class="vid-cat ${v.cat}">${v.cat}</span></div>
+      <div class="vid-info">
+        <div class="vid-title">${v.title}</div>
+        <div class="vid-ch">${v.ch}</div>
+        <div class="vid-link">🔍 Buscar en YouTube →</div>
+      </div>
+    </a>`).join('')||'<div class="no-data">Sin videos en esta categoría.</div>';
+}
+
+// ── GARMIN WORKOUTS ───────────────────────────────
+function renderGarminWks(){
+  const zoneLabel=z=>({z1:'z1',z2:'z2',z3:'z3',z4:'z4',z5:'z5','z1–z2':'z2','z4–z5':'z4'}[z]||'z2');
+  document.getElementById('garminWks').innerHTML=GZ_WKS.map((w,i)=>`
+    <div class="gz-workout">
+      <div class="gz-wk-hd" onclick="toggleGW('gwb-${i}','gwa-${i}')">
+        <span class="gz-wk-nm">${w.name}</span>
+        <span class="gz-wk-ic" id="gwa-${i}">▼</span>
+      </div>
+      <div class="gz-detail" id="gwb-${i}">
+        <table class="gz-table" style="margin-bottom:10px">
+          <thead><tr><th>Fase</th><th>Duración</th><th>Zona</th><th>Notas</th></tr></thead>
+          <tbody>${w.steps.map(s=>`<tr><td>${s.p}</td><td>${s.d}</td><td><span class="zone-pill ${zoneLabel(s.z)}">${s.z.toUpperCase()}</span></td><td style="font-size:11px;color:var(--txt3)">${s.n}</td></tr>`).join('')}</tbody>
+        </table>
+        <div class="gz-tip">⌚ ${w.tip}</div>
+      </div>
+    </div>`).join('');
+}
+function toggleGW(bid,aid){
+  const b=document.getElementById(bid),a=document.getElementById(aid);
+  const vis=b.style.display==='block';
+  b.style.display=vis?'none':'block';
+  if(a) a.style.transform=vis?'':'rotate(180deg)';
+}
+
+// ── INIT ─────────────────────────────────────────
+function init(){
+  document.getElementById('lDate').value=dkey(today());
+  curWk=wkNum(today());
+  renderHoy();
+  renderWeek();
+  renderPlan();
+  renderGarminWks();
+  renderVideos();
+  renderLogHist();
+  loadKPIs();
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
