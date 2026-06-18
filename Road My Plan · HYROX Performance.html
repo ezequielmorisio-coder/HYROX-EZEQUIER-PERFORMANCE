@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<!-- saved from url=(0118)file:///Users/ezequielmorisio/Documents/Claude/Projects/ROAD%20TO%20HYROX%20PERFORMANCE/HYROX_Rio_Dashboard_Movil.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Road My Plan · HYROX Performance</title>
+<meta name="apple-mobile-web-app-title" content="HYROX Plan">
+<style>
+:root{
+  --bg:#0d0d0d;--bg2:#1a1a1a;--bg3:#242424;--bg4:#2e2e2e;
+  --txt:#f0f0f0;--txt2:#aaa;--txt3:#666;
+  --blue:#2196F3;--blue2:#1565C0;--orange:#FF9800;--red:#F44336;
+  --green:#4CAF50;--green2:#2E7D32;--purple:#9C27B0;--purple2:#6A1B9A;
+  --gold:#FFD700;--grey:#607D8B;--teal:#00897B;
+  --radius:12px;--radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:72px}
+.header{background:linear-gradient(135deg,#0d0d0d 0%,#1a1a2e 100%);padding:16px 20px 12px;border-bottom:1px solid #222;position:sticky;top:0;z-index:100}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.logo{font-size:13px;font-weight:700;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase}
+.countdown-box{background:rgba(244,67,54,0.15);border:1px solid rgba(244,67,54,0.4);border-radius:20px;padding:4px 10px;text-align:center}
+.countdown-days{font-size:18px;font-weight:800;color:#F44336;line-height:1}
+.countdown-label{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:0.5px}
+.phase-bar{display:flex;align-items:center;gap:8px}
+.phase-chip{background:var(--blue);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.week-info{font-size:12px;color:var(--txt2)}
+.dates-info{font-size:11px;color:var(--txt3)}
+
+/* TABS */
+.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg2);border-top:1px solid #2a2a2a;display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;cursor:pointer;transition:all 0.2s}
+.tab-icon{font-size:20px;margin-bottom:2px}
+.tab-label{font-size:10px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;transition:color 0.2s}
+.tab.active .tab-label{color:var(--blue)}
+.tab.active .tab-icon{filter:drop-shadow(0 0 4px var(--blue))}
+
+/* CONTENT AREAS */
+.view{display:none;padding:16px}
+.view.active{display:block}
+
+/* CARDS */
+.card{background:var(--bg2);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1px solid #222}
+.card-title{font-size:13px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+
+/* SESSION TYPES */
+.type-z2{border-left:4px solid var(--blue)}
+.type-umbral{border-left:4px solid var(--orange)}
+.type-intervalos{border-left:4px solid var(--red)}
+.type-larga{border-left:4px solid var(--blue2)}
+.type-fuerzaA{border-left:4px solid var(--green)}
+.type-fuerzaB{border-left:4px solid var(--green2)}
+.type-hyrox{border-left:4px solid var(--purple)}
+.type-simulacion{border-left:4px solid var(--purple2)}
+.type-recuperacion{border-left:4px solid var(--grey)}
+.type-descanso{border-left:4px solid #333;opacity:0.7}
+.type-competencia{border-left:4px solid var(--gold)}
+.type-media_maraton{border-left:4px solid var(--teal)}
+.type-maraton{border-left:4px solid #FF5722}
+.type-descarga{border-left:4px solid #78909C}
+
+.session-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.session-type-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dot-z2{background:var(--blue)}
+.dot-umbral{background:var(--orange)}
+.dot-intervalos{background:var(--red)}
+.dot-larga{background:var(--blue2)}
+.dot-fuerzaA{background:var(--green)}
+.dot-fuerzaB{background:var(--green2)}
+.dot-hyrox{background:var(--purple)}
+.dot-simulacion{background:var(--purple2)}
+.dot-recuperacion{background:var(--grey)}
+.dot-descanso{background:#444}
+.dot-competencia{background:var(--gold)}
+.dot-media_maraton{background:var(--teal)}
+.dot-maraton{background:#FF5722}
+.dot-descarga{background:#78909C}
+
+/* ===== SPLASH SCREEN ===== */
+#splash{
+  position:fixed;inset:0;z-index:9999;
+  background:#060810;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px;text-align:center;
+  transition:opacity 0.6s ease, transform 0.6s ease;
+}
+#splash.hide{opacity:0;transform:scale(1.04);pointer-events:none}
+.splash-hex{
+  width:90px;height:90px;margin-bottom:24px;position:relative;
+}
+.splash-hex svg{width:100%;height:100%;animation:hexPulse 1.8s ease-in-out infinite}
+@keyframes hexPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.7;transform:scale(0.95)}}
+.splash-brand{font-size:11px;font-weight:800;letter-spacing:4px;color:#2196F3;text-transform:uppercase;margin-bottom:6px;opacity:0;animation:fadeUp 0.5s ease 0.3s forwards}
+.splash-title{font-size:30px;font-weight:900;color:#fff;line-height:1.05;letter-spacing:-0.5px;opacity:0;animation:fadeUp 0.5s ease 0.5s forwards}
+.splash-title span{color:#2196F3}
+.splash-athlete{font-size:13px;color:#607D8B;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-top:10px;opacity:0;animation:fadeUp 0.5s ease 0.7s forwards}
+.splash-goal{margin-top:20px;background:rgba(244,67,54,0.12);border:1px solid rgba(244,67,54,0.3);border-radius:30px;padding:8px 20px;opacity:0;animation:fadeUp 0.5s ease 0.9s forwards}
+.splash-goal-text{font-size:13px;font-weight:800;color:#F44336;letter-spacing:1px}
+.splash-goal-sub{font-size:10px;color:#888;margin-top:1px}
+.splash-bar-wrap{width:160px;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;margin-top:32px;overflow:hidden;opacity:0;animation:fadeUp 0.4s ease 1.1s forwards}
+.splash-bar{height:100%;width:0%;background:linear-gradient(90deg,#1565C0,#2196F3);border-radius:2px;animation:barLoad 1.4s ease 1.2s forwards}
+@keyframes barLoad{to{width:100%}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.splash-rio{font-size:10px;color:#333;letter-spacing:2px;text-transform:uppercase;margin-top:16px;opacity:0;animation:fadeUp 0.4s ease 1.3s forwards}
+
+.session-name{font-size:15px;font-weight:700;color:var(--txt)}
+.session-duration{font-size:11px;color:var(--txt2);margin-left:auto;font-weight:600}
+.session-desc{font-size:13px;color:var(--txt2);line-height:1.5;margin-bottom:10px}
+.session-details{background:var(--bg3);border-radius:var(--radius-sm);padding:12px;margin-top:8px}
+.detail-item{display:flex;gap:8px;padding:4px 0;font-size:12px;color:var(--txt2);border-bottom:1px solid rgba(255,255,255,0.05)}
+.detail-item:last-child{border-bottom:none}
+.detail-step{color:var(--blue);font-weight:700;min-width:20px;font-size:11px}
+.garmin-box{background:rgba(33,150,243,0.08);border:1px solid rgba(33,150,243,0.2);border-radius:var(--radius-sm);padding:10px;margin-top:8px}
+.garmin-title{font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.garmin-text{font-size:11px;color:var(--txt2);line-height:1.5}
+.toggle-details{background:var(--bg3);border:none;color:var(--blue);font-size:12px;font-weight:700;padding:8px 14px;border-radius:20px;cursor:pointer;margin-top:8px;width:100%;text-align:center}
+
+/* TODAY VIEW */
+.today-date{font-size:13px;color:var(--txt2);margin-bottom:4px}
+.today-title{font-size:22px;font-weight:800;color:var(--txt);margin-bottom:16px}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.metric-card{background:var(--bg2);border-radius:var(--radius-sm);padding:12px;text-align:center;border:1px solid #222}
+.metric-val{font-size:24px;font-weight:800;color:var(--blue);line-height:1}
+.metric-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
+
+/* WEEK VIEW */
+.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.week-nav-btn{background:var(--bg3);border:none;color:var(--txt);font-size:18px;padding:8px 14px;border-radius:var(--radius-sm);cursor:pointer}
+.week-nav-label{font-size:14px;font-weight:700;color:var(--txt);text-align:center}
+.week-phase{font-size:11px;color:var(--txt2);text-align:center}
+.day-card{background:var(--bg2);border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden;cursor:pointer}
+.day-header{display:flex;align-items:center;padding:12px 14px;gap:12px}
+.day-name{font-size:12px;font-weight:700;color:var(--txt3);width:32px;text-transform:uppercase}
+.day-session{flex:1}
+.day-session-name{font-size:14px;font-weight:700;color:var(--txt)}
+.day-session-meta{font-size:11px;color:var(--txt2)}
+.day-today-badge{font-size:9px;background:var(--blue);color:#fff;padding:2px 6px;border-radius:10px;font-weight:700;text-transform:uppercase}
+.day-expanded{padding:0 14px 12px;display:none}
+.day-expanded.open{display:block}
+
+/* PLAN VIEW */
+.phase-section{margin-bottom:20px}
+.phase-header{background:var(--bg3);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.phase-num{background:var(--blue);color:#fff;font-size:12px;font-weight:800;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.phase-info{flex:1}
+.phase-name{font-size:14px;font-weight:700;color:var(--txt)}
+.phase-dates{font-size:11px;color:var(--txt2)}
+.phase-weeks-list{padding:0 4px}
+.week-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;transition:background 0.15s}
+.week-row:hover{background:var(--bg3)}
+.week-row.current-week{background:rgba(33,150,243,0.12);border:1px solid rgba(33,150,243,0.25)}
+.week-num{font-size:13px;font-weight:700;color:var(--txt2);width:50px}
+.week-focus{font-size:12px;color:var(--txt);flex:1}
+.week-vol{font-size:11px;color:var(--txt3);font-weight:600}
+.week-badge{font-size:9px;padding:2px 6px;border-radius:10px;font-weight:700;color:#fff}
+.badge-descarga{background:#546E7A}
+.badge-competencia{background:#F44336}
+.badge-current{background:var(--blue)}
+
+/* GARMIN VIEW */
+.garmin-section{margin-bottom:16px}
+.garmin-section-title{font-size:16px;font-weight:800;color:var(--txt);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #2a2a2a}
+.setup-step{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.setup-num{background:var(--blue);color:#fff;font-size:12px;font-weight:800;min-width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.setup-content{flex:1}
+.setup-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:2px}
+.setup-desc{font-size:12px;color:var(--txt2);line-height:1.5}
+.zone-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+.zone-table th{background:var(--bg3);color:var(--txt2);padding:6px 8px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
+.zone-table td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--txt2)}
+.zone-table tr:last-child td{border-bottom:none}
+.z1c{color:#4FC3F7}.z2c{color:var(--blue)}.z3c{color:var(--orange)}.z4c{color:#EF5350}.z5c{color:#B71C1C}
+
+.workout-card{background:var(--bg3);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px}
+.workout-name{font-size:14px;font-weight:700;color:var(--txt);margin-bottom:4px}
+.workout-type-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;color:#fff;margin-bottom:8px}
+.workout-steps{font-size:12px;color:var(--txt2);line-height:1.8}
+.workout-step{display:flex;gap:6px;padding:2px 0}
+.step-num{color:var(--blue);font-weight:700;min-width:16px}
+
+/* ALERT BOX */
+.alert{border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px;font-size:12px;line-height:1.5}
+.alert-red{background:rgba(244,67,54,0.1);border-left:3px solid #F44336;color:#ef9a9a}
+.alert-orange{background:rgba(255,152,0,0.1);border-left:3px solid #FF9800;color:#ffcc80}
+.alert-blue{background:rgba(33,150,243,0.1);border-left:3px solid var(--blue);color:#90CAF9}
+
+/* PROGRESS BAR */
+.progress-bar-wrap{background:var(--bg3);border-radius:10px;height:6px;margin:8px 0 4px}
+.progress-bar-fill{height:6px;border-radius:10px;background:linear-gradient(90deg,var(--blue),#21CBF3)}
+.progress-label{font-size:10px;color:var(--txt3);display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+
+<!-- ===== SPLASH SCREEN ===== -->
+<div id="splash" class="hide" style="display: none;">
+  <div class="splash-hex">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,4 93,27.5 93,72.5 50,96 7,72.5 7,27.5" fill="none" stroke="#1565C0" stroke-width="2.5"></polygon>
+      <polygon points="50,14 83,31.5 83,68.5 50,86 17,68.5 17,31.5" fill="rgba(33,150,243,0.08)" stroke="#2196F3" stroke-width="1.5"></polygon>
+      <text x="50" y="57" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="22" font-weight="900" fill="#fff">H</text>
+    </svg>
+  </div>
+  <div class="splash-brand">Road My Plan</div>
+  <div class="splash-title">HYROX<br><span>Performance</span></div>
+  <div class="splash-athlete">Ezequiel Morisio</div>
+  <div class="splash-goal">
+    <div class="splash-goal-text">🏁 SUB 60 MIN</div>
+    <div class="splash-goal-sub">HYROX Rio de Janeiro · 20 Nov 2026</div>
+  </div>
+  <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+  <div class="splash-rio">155 dias para Rio</div>
+</div>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo">⚡ Road to HYROX Rio</div>
+    <div class="countdown-box">
+      <div class="countdown-days" id="countdown-days">155</div>
+      <div class="countdown-label">dias para Rio</div>
+    </div>
+  </div>
+  <div class="phase-bar">
+    <div class="phase-chip" id="header-phase">Fase 1</div>
+    <div>
+      <div class="week-info" id="header-week">Semana 1 de 24</div>
+      <div class="dates-info" id="header-dates">17-23 jun 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- TODAY TAB -->
+<div class="view active" id="view-hoy">
+  <div class="today-date" id="today-date">Miercoles, 17 de junio 2026</div>
+  <div class="today-title" id="today-title">Carrera Z2 Corta</div>
+
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-val">52</div>
+      <div class="metric-label">VO2max actual</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">77</div>
+      <div class="metric-label">Peso kg</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" id="week-num-metric">1</div>
+      <div class="metric-label">Semana actual</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" id="sessions-done">0</div>
+      <div class="metric-label">Sims completadas</div>
+    </div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="season-progress" style="width: 1%;"></div>
+  </div>
+  <div class="progress-label"><span>Inicio</span><span id="progress-pct">1% del plan</span><span>Rio 2026</span></div>
+
+  <div style="margin-top:16px" id="today-session-container"><div class="card type-z2"><div class="session-header"><div class="session-type-dot dot-z2"></div><div class="session-name">Carrera Z2 Corta</div><div class="session-duration">40 min</div></div><div class="session-desc">Sesion aerobica corta. Ritmo conversacional toda la sesion.</div><div class="session-details"><div class="detail-item"><span class="detail-step">1</span><span>Calentamiento 3 min</span></div><div class="detail-item"><span class="detail-step">2</span><span>30-35 min continuo FC 116-134</span></div><div class="detail-item"><span class="detail-step">3</span><span>Drills de economia: A-march 2x20m, skip 2x20m</span></div><div class="detail-item"><span class="detail-step">4</span><span>Enfriamiento 5 min</span></div></div><div class="garmin-box"><div class="garmin-title">⌛ Garmin</div><div class="garmin-text">Perfil "Carrera Z2" | Alerta FC 116-134 | Duracion: 40 min</div></div></div></div>
+</div>
+
+<!-- WEEK TAB -->
+<div class="view" id="view-semana">
+  <div class="week-nav">
+    <button class="week-nav-btn" onclick="changeWeek(-1)">←</button>
+    <div>
+      <div class="week-nav-label" id="week-nav-label">Semana 1 de 24</div>
+      <div class="week-phase" id="week-nav-phase">Fase 1 — Base | 80% volumen | 17-23 jun</div>
+    </div>
+    <button class="week-nav-btn" onclick="changeWeek(1)">→</button>
+  </div>
+  <div id="week-days-container"><div class="day-card" onclick="toggleDay(this)"><div class="day-header" style="border-left:3px solid #2196F3"><div class="day-name">LUN</div><div class="day-session"><div class="day-session-name">Carrera Z2</div><div class="day-session-meta">50 min • Carrera Z2</div></div></div><div class="day-expanded"><div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Carrera aerobica base — el fundamento de toda la temporada.</div><div class="detail-item"><span class="detail-step">1</span><span style="font-size:12px;color:var(--txt2)">Calentamiento 5 min caminata</span></div><div class="detail-item"><span class="detail-step">2</span><span style="font-size:12px;color:var(--txt2)">35-45 min continuo FC 116-134 bpm (Z2)</span></div><div class="detail-item"><span class="detail-step">3</span><span style="font-size:12px;color:var(--txt2)">Si FC sube de 134: bajar el paso inmediatamente</span></div><div class="detail-item"><span class="detail-step">4</span><span style="font-size:12px;color:var(--txt2)">2x80m strides a 4:00/km (ultimos 8 min)</span></div><div class="detail-item"><span class="detail-step">5</span><span style="font-size:12px;color:var(--txt2)">Enfriamiento 5 min caminata</span></div><div class="garmin-box" style="margin-top:8px"><div class="garmin-title">⌛ Garmin</div><div class="garmin-text">Perfil "Carrera Z2" | Alerta FC: 116-134 | Duracion: 50 min</div></div></div></div><div class="day-card" onclick="toggleDay(this)"><div class="day-header" style="border-left:3px solid #4CAF50"><div class="day-name">MAR</div><div class="day-session"><div class="day-session-name">Fuerza A - Tren Inferior</div><div class="day-session-meta">55-60 min • Fuerza A</div></div></div><div class="day-expanded"><div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Cadena posterior y glúteos. Clave para sled pull, lunges y correr eficiente.</div><div class="detail-item"><span class="detail-step">1</span><span style="font-size:12px;color:var(--txt2)">Hip Thrust (barra): 4x12-15 con carga moderada</span></div><div class="detail-item"><span class="detail-step">2</span><span style="font-size:12px;color:var(--txt2)">RDL Mancuernas: 3x10-12 — espalda neutra siempre</span></div><div class="detail-item"><span class="detail-step">3</span><span style="font-size:12px;color:var(--txt2)">Sentadilla Goblet: 3x12</span></div><div class="detail-item"><span class="detail-step">4</span><span style="font-size:12px;color:var(--txt2)">Estocada Reversa (MC): 3x10 cada lado</span></div><div class="detail-item"><span class="detail-step">5</span><span style="font-size:12px;color:var(--txt2)">RDL una pierna: 3x8 cada lado</span></div><div class="detail-item"><span class="detail-step">6</span><span style="font-size:12px;color:var(--txt2)">Elevacion talon sentado (soleo): 3x20 lento</span></div><div class="detail-item"><span class="detail-step">7</span><span style="font-size:12px;color:var(--txt2)">Dead Bug: 3x8 cada lado</span></div><div class="detail-item"><span class="detail-step">8</span><span style="font-size:12px;color:var(--txt2)">Adductor plank Copenhagen: 3x10 seg cada lado</span></div><div class="garmin-box" style="margin-top:8px"><div class="garmin-title">⌛ Garmin</div><div class="garmin-text">Registrar en Gravl: cargas y repeticiones de cada ejercicio</div></div></div></div><div class="day-card" onclick="toggleDay(this)"><div class="day-header" style="border-left:3px solid #2196F3"><div class="day-name">MIE</div><div class="day-session"><div class="day-session-name">Carrera Z2 Corta</div><div class="day-session-meta">40 min • Carrera Z2</div></div><div class="day-today-badge">HOY</div></div><div class="day-expanded"><div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Sesion aerobica corta. Ritmo conversacional toda la sesion.</div><div class="detail-item"><span class="detail-step">1</span><span style="font-size:12px;color:var(--txt2)">Calentamiento 3 min</span></div><div class="detail-item"><span class="detail-step">2</span><span style="font-size:12px;color:var(--txt2)">30-35 min continuo FC 116-134</span></div><div class="detail-item"><span class="detail-step">3</span><span style="font-size:12px;color:var(--txt2)">Drills de economia: A-march 2x20m, skip 2x20m</span></div><div class="detail-item"><span class="detail-step">4</span><span style="font-size:12px;color:var(--txt2)">Enfriamiento 5 min</span></div><div class="garmin-box" style="margin-top:8px"><div class="garmin-title">⌛ Garmin</div><div class="garmin-text">Perfil "Carrera Z2" | Alerta FC 116-134 | Duracion: 40 min</div></div></div></div><div class="day-card" onclick="toggleDay(this)"><div class="day-header" style="border-left:3px solid #2E7D32"><div class="day-name">JUE</div><div class="day-session"><div class="day-session-name">Fuerza B - Funcional</div><div class="day-session-meta">55-60 min • Fuerza B</div></div></div><div class="day-expanded"><div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Tren superior, jalones y fuerza funcional especifica HYROX.</div><div class="detail-item"><span class="detail-step">1</span><span style="font-size:12px;color:var(--txt2)">Jalon al pecho (agarre amplio): 4x10-12 — prep Ski Erg</span></div><div class="detail-item"><span class="detail-step">2</span><span style="font-size:12px;color:var(--txt2)">Remo en polea sentado: 3x12</span></div><div class="detail-item"><span class="detail-step">3</span><span style="font-size:12px;color:var(--txt2)">Remo mancuerna un brazo: 3x10 c/lado</span></div><div class="detail-item"><span class="detail-step">4</span><span style="font-size:12px;color:var(--txt2)">Farmer Carry: 4x30m carga pesada</span></div><div class="detail-item"><span class="detail-step">5</span><span style="font-size:12px;color:var(--txt2)">Wall Ball: 4x20 con enfasis en empuje de piernas</span></div><div class="detail-item"><span class="detail-step">6</span><span style="font-size:12px;color:var(--txt2)">KB Swing: 3x15</span></div><div class="detail-item"><span class="detail-step">7</span><span style="font-size:12px;color:var(--txt2)">Pallof Press: 3x12 c/lado</span></div><div class="detail-item"><span class="detail-step">8</span><span style="font-size:12px;color:var(--txt2)">Face Pull: 3x15 ligero</span></div><div class="garmin-box" style="margin-top:8px"><div class="garmin-title">⌛ Garmin</div><div class="garmin-text">Registrar en Gravl. Wall Ball: contar reps sin pausas.</div></div></div></div><div class="day-card" onclick="toggleDay(this)"><div class="day-header" style="border-left:3px solid #607D8B"><div class="day-name">VIE</div><div class="day-session"><div class="day-session-name">Recuperacion Activa</div><div class="day-session-meta">30-40 min • Recuperacion Activa</div></div></div><div class="day-expanded"><div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Movimiento de baja intensidad para acelerar recuperacion. NO es un dia libre de esfuerzo.</div><div class="detail-item"><span class="detail-step">1</span><span style="font-size:12px;color:var(--txt2)">Caminata 20-30 min (FC &lt; 110)</span></div><div class="detail-item"><span class="detail-step">2</span><span style="font-size:12px;color:var(--txt2)">Movilidad: cadera 90/90, rodilla al pecho, piriforme</span></div><div class="detail-item"><span class="detail-step">3</span><span style="font-size:12px;color:var(--txt2)">Foam roll: cuadriceps, IT band, gemelos, lats</span></div><div class="detail-item"><span class="detail-step">4</span><span style="font-size:12px;color:var(--txt2)">Face pull con goma 3x20</span></div><div class="detail-item"><span class="detail-step">5</span><span style="font-size:12px;color:var(--txt2)">Hombros CARs: 5 circulos c/direccion c/brazo</span></div><div class="detail-item"><span class="detail-step">6</span><span style="font-size:12px;color:var(--txt2)">Si hay acceso: sauna o ducha de contraste</span></div><div class="garmin-box" style="margin-top:8px"><div class="garmin-title">⌛ Garmin</div><div class="garmin-text">Actividad "Caminata" o "Yoga" — solo para registrar movimiento</div></div></div></div><div class="day-card" onclick="toggleDay(this)"><div class="day-header" style="border-left:3px solid #FF9800"><div class="day-name">SAB</div><div class="day-session"><div class="day-session-name">Tempo 2x10 min</div><div class="day-session-meta">40 min • Umbral/Tempo</div></div></div><div class="day-expanded"><div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Primera exposicion al umbral de lactato. Esfuerzo controlado.</div><div class="detail-item"><span class="detail-step">1</span><span style="font-size:12px;color:var(--txt2)">Calentamiento 10 min suave</span></div><div class="detail-item"><span class="detail-step">2</span><span style="font-size:12px;color:var(--txt2)">Bloque 1: 10 min a 4:50-5:00/km (FC 147-155)</span></div><div class="detail-item"><span class="detail-step">3</span><span style="font-size:12px;color:var(--txt2)">Recuperacion 3 min trote suave</span></div><div class="detail-item"><span class="detail-step">4</span><span style="font-size:12px;color:var(--txt2)">Bloque 2: 10 min a 4:50-5:00/km</span></div><div class="detail-item"><span class="detail-step">5</span><span style="font-size:12px;color:var(--txt2)">Enfriamiento 10 min suave</span></div><div class="garmin-box" style="margin-top:8px"><div class="garmin-title">⌛ Garmin</div><div class="garmin-text">Perfil "Umbral" | Alertas paso: 4:50-5:00/km | Total ~40 min</div></div></div></div><div class="day-card" onclick="toggleDay(this)"><div class="day-header" style="border-left:3px solid #333"><div class="day-name">DOM</div><div class="day-session"><div class="day-session-name">Descanso Completo</div><div class="day-session-meta">--- • Descanso Completo</div></div></div><div class="day-expanded"><div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Sin entrenamiento. Recuperacion y adaptacion.</div><div class="detail-item"><span class="detail-step">1</span><span style="font-size:12px;color:var(--txt2)">Sin sesion de entrenamiento estructurada</span></div><div class="detail-item"><span class="detail-step">2</span><span style="font-size:12px;color:var(--txt2)">Caminata casual hasta 30 min si queres</span></div><div class="detail-item"><span class="detail-step">3</span><span style="font-size:12px;color:var(--txt2)">Prioridad: dormir 8 hs o mas</span></div><div class="detail-item"><span class="detail-step">4</span><span style="font-size:12px;color:var(--txt2)">Nutricion: mantener proteina alta (170g)</span></div><div class="detail-item"><span class="detail-step">5</span><span style="font-size:12px;color:var(--txt2)">Hidratacion normal</span></div><div class="detail-item"><span class="detail-step">6</span><span style="font-size:12px;color:var(--txt2)">Foam roll si hay dolor muscular especifico</span></div><div class="garmin-box" style="margin-top:8px"><div class="garmin-title">⌛ Garmin</div><div class="garmin-text">Sin actividad en Garmin. Chequear morning report y anotar HRV.</div></div></div></div></div>
+</div>
+
+<!-- PLAN TAB -->
+<div class="view" id="view-plan">
+  <div class="card" style="padding:12px">
+    <div class="card-title">Macrociclo 24 semanas</div>
+    <div class="alert alert-blue">Hoy estas en <strong id="plan-current-week-label">Semana 1 de 24</strong>. Toca cualquier semana para ver el detalle.</div>
+  </div>
+  <div id="plan-container"><div class="phase-section"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">1</div><div class="phase-info"><div class="phase-name">Fase 1 — Base</div><div class="phase-dates">17-23 jun — 15-21 jul</div></div><div style="color:var(--txt3);font-size:18px">▼</div></div><div class="phase-weeks-list"><div class="week-row current-week" onclick="jumpToWeek(0)"><div class="week-num">Sem 1</div><div class="week-focus">Base aerobica + forma de carrera</div><div class="week-vol">80%</div><span class="week-badge badge-current">HOY</span></div><div class="week-row " onclick="jumpToWeek(1)"><div class="week-num">Sem 2</div><div class="week-focus">Economia + strides</div><div class="week-vol">85%</div></div><div class="week-row " onclick="jumpToWeek(2)"><div class="week-num">Sem 3</div><div class="week-focus">Umbral inicial</div><div class="week-vol">90%</div></div><div class="week-row " onclick="jumpToWeek(4)"><div class="week-num">Sem 5</div><div class="week-focus">Economia + volumen</div><div class="week-vol">90%</div></div></div></div><div class="phase-section"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">2</div><div class="phase-info"><div class="phase-name">Fase 1 — DESCARGA</div><div class="phase-dates">8-14 jul — 8-14 jul</div></div><div style="color:var(--txt3);font-size:18px">▼</div></div><div class="phase-weeks-list"><div class="week-row " onclick="jumpToWeek(3)"><div class="week-num">Sem 4</div><div class="week-focus">Semana de descarga — recuperacion</div><div class="week-vol">60%</div><span class="week-badge badge-descarga">DESC</span></div></div></div><div class="phase-section"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">3</div><div class="phase-info"><div class="phase-name">Fase 2 — Build I</div><div class="phase-dates">22-28 jul — 5-11 ago</div></div><div style="color:var(--txt3);font-size:18px">▼</div></div><div class="phase-weeks-list"><div class="week-row " onclick="jumpToWeek(5)"><div class="week-num">Sem 6</div><div class="week-focus">Introduccion VO2max + estaciones</div><div class="week-vol">95%</div></div><div class="week-row " onclick="jumpToWeek(6)"><div class="week-num">Sem 7</div><div class="week-focus">Umbral intenso + combos estaciones</div><div class="week-vol">95%</div></div><div class="week-row " onclick="jumpToWeek(7)"><div class="week-num">Sem 8</div><div class="week-focus">Paso HYROX + fuerza</div><div class="week-vol">100%</div></div></div></div><div class="phase-section"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">4</div><div class="phase-info"><div class="phase-name">Fase 2 — DESCARGA</div><div class="phase-dates">12-18 ago — 12-18 ago</div></div><div style="color:var(--txt3);font-size:18px">▼</div></div><div class="phase-weeks-list"><div class="week-row " onclick="jumpToWeek(8)"><div class="week-num">Sem 9</div><div class="week-focus">Descarga activa</div><div class="week-vol">65%</div><span class="week-badge badge-descarga">DESC</span></div></div></div><div class="phase-section"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">5</div><div class="phase-info"><div class="phase-name">Fase 2 — Taper HM</div><div class="phase-dates">19-25 ago — 19-25 ago</div></div><div style="color:var(--txt3);font-size:18px">▼</div></div><div class="phase-weeks-list"><div class="week-row " onclick="jumpToWeek(9)"><div class="week-num">Sem 10</div><div class="week-focus">Afinacion Media Maraton</div><div class="week-vol">80%</div><span class="week-badge badge-competencia">COMP</span></div></div></div><div class="phase-section"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">6</div><div class="phase-info"><div class="phase-name">Fase 3 — Build II</div><div class="phase-dates">26 ago - 1 sep — 16-22 sep</div></div><div style="color:var(--txt3);font-size:18px">▼</div></div><div class="phase-weeks-list"><div class="week-row " onclick="jumpToWeek(10)"><div class="week-num">Sem 11</div><div class="week-focus">Recuperacion HM + reinicio</div><div class="week-vol">75%</div></div><div class="week-row " onclick="jumpToWeek(11)"><div class="week-num">Sem 12</div><div class="week-focus">HYROX especifico + sim #3</div><div class="week-vol">100%</div></div><div class="week-row " onclick="jumpToWeek(12)"><div class="week-num">Sem 13</div><div class="week-focus">Pico de intensidad</div><div class="week-vol">100%</div></div><div class="week-row " onclick="jumpToWeek(13)"><div class="week-num">Sem 14</div><div class="week-focus">Taper Maraton</div><div class="week-vol">85%</div><span class="week-badge badge-competencia">COMP</span></div></div></div><div class="phase-section"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">7</div><div class="phase-info"><div class="phase-name">Fase 3 — MARATON</div><div class="phase-dates">20 sep-27 sep — 20 sep-27 sep</div></div><div style="color:var(--txt3);font-size:18px">▼</div></div><div class="phase-weeks-list"><div class="week-row " onclick="jumpToWeek(14)"><div class="week-num">Sem 15</div><div class="week-focus">Semana de Maraton</div><div class="week-vol">70%</div><span class="week-badge badge-competencia">COMP</span></div></div></div><div class="phase-section"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">8</div><div class="phase-info"><div class="phase-name">Recuperacion Maraton — DESCARGA</div><div class="phase-dates">28 sep - 4 oct — 28 sep - 4 oct</div></div><div style="color:var(--txt3);font-size:18px">▼</div></div><div class="phase-weeks-list"><div class="week-row " onclick="jumpToWeek(15)"><div class="week-num">Sem 16</div><div class="week-focus">Recuperacion obligatoria post-maraton</div><div class="week-vol">50%</div><span class="week-badge badge-descarga">DESC</span></div></div></div><div class="phase-section"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">9</div><div class="phase-info"><div class="phase-name">Fase 4 — Afilamiento</div><div class="phase-dates">5-11 oct — 19-25 oct</div></div><div style="color:var(--txt3);font-size:18px">▼</div></div><div class="phase-weeks-list"><div class="week-row " onclick="jumpToWeek(16)"><div class="week-num">Sem 17</div><div class="week-focus">Retorno a intensidad + sim #5</div><div class="week-vol">85%</div></div><div class="week-row " onclick="jumpToWeek(17)"><div class="week-num">Sem 18</div><div class="week-focus">Pico de simulaciones</div><div class="week-vol">100%</div></div><div class="week-row " onclick="jumpToWeek(18)"><div class="week-num">Sem 19</div><div class="week-focus">Afinacion final</div><div class="week-vol">95%</div></div></div></div><div class="phase-section"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">10</div><div class="phase-info"><div class="phase-name">Fase 4 — Pre-Taper DESCARGA</div><div class="phase-dates">26 oct - 1 nov — 26 oct - 1 nov</div></div><div style="color:var(--txt3);font-size:18px">▼</div></div><div class="phase-weeks-list"><div class="week-row " onclick="jumpToWeek(19)"><div class="week-num">Sem 20</div><div class="week-focus">Descarga previa al taper</div><div class="week-vol">65%</div><span class="week-badge badge-descarga">DESC</span></div></div></div><div class="phase-section"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">11</div><div class="phase-info"><div class="phase-name">Fase 5 — Taper</div><div class="phase-dates">2-8 nov — 9-15 nov</div></div><div style="color:var(--txt3);font-size:18px">▼</div></div><div class="phase-weeks-list"><div class="week-row " onclick="jumpToWeek(20)"><div class="week-num">Sem 21</div><div class="week-focus">Mantener filo — bajar volumen</div><div class="week-vol">55%</div></div><div class="week-row " onclick="jumpToWeek(21)"><div class="week-num">Sem 22</div><div class="week-focus">Filo de carrera + sim #8 reducida</div><div class="week-vol">45%</div></div></div></div><div class="phase-section"><div class="phase-header" onclick="togglePhase(this)"><div class="phase-num">12</div><div class="phase-info"><div class="phase-name">Fase 5 — Semana de Carrera</div><div class="phase-dates">16-20 nov — 16-20 nov</div></div><div style="color:var(--txt3);font-size:18px">▼</div></div><div class="phase-weeks-list"><div class="week-row " onclick="jumpToWeek(22)"><div class="week-num">Sem 23</div><div class="week-focus">Activacion + viaje a Rio</div><div class="week-vol">30%</div><span class="week-badge badge-competencia">COMP</span></div></div></div></div>
+</div>
+
+<!-- GARMIN TAB -->
+<div class="view" id="view-garmin">
+  <div class="garmin-section">
+    <div class="garmin-section-title">⏱ Configuracion Garmin FR265</div>
+
+    <div class="setup-step">
+      <div class="setup-num">1</div>
+      <div class="setup-content">
+        <div class="setup-title">Configurar zonas de frecuencia cardiaca</div>
+        <div class="setup-desc">Menu &gt; Mi perfil &gt; Zonas FC &gt; Basado en FC maxima &gt; 179 bpm<br><br>
+        <strong>Configurar manualmente:</strong></div>
+        <table class="zone-table">
+          <tbody><tr><th>Zona</th><th>%FC max</th><th>BPM</th><th>Uso</th></tr>
+          <tr><td class="z1c">Z1</td><td>50-65%</td><td class="z1c">90-116</td><td>Recuperacion</td></tr>
+          <tr><td class="z2c">Z2</td><td>65-75%</td><td class="z2c">116-134</td><td>Base aerobica</td></tr>
+          <tr><td class="z3c">Z3</td><td>75-82%</td><td class="z3c">134-147</td><td>Tempo / aerobico alto</td></tr>
+          <tr><td class="z4c">Z4</td><td>82-90%</td><td class="z4c">147-161</td><td>Umbral lactato (ritmo HYROX)</td></tr>
+          <tr><td class="z5c">Z5</td><td>90-100%</td><td class="z5c">161-179</td><td>VO2max / esfuerzo maximo</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="setup-num">2</div>
+      <div class="setup-content">
+        <div class="setup-title">Activar Morning Report &amp; Training Readiness</div>
+        <div class="setup-desc">Menu &gt; Sistema &gt; Formato &gt; Morning Report &gt; Activar<br>
+        Esto te muestra HRV status, energia corporal y estado de entrenamiento cada manana. <strong>Revisar antes de decidir la intensidad del dia.</strong></div>
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="setup-num">3</div>
+      <div class="setup-content">
+        <div class="setup-title">Activar Training Status &amp; Load</div>
+        <div class="setup-desc">Menu &gt; Estado del entrenamiento &gt; activar<br>
+        Valores objetivo: Training Status = "En forma" o "Pico". Si dice "Sobreesfuerzo" por 3 dias seguidos: descarga inmediata.</div>
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="setup-num">4</div>
+      <div class="setup-content">
+        <div class="setup-title">Configurar alerta de FC para entrenamientos Z2</div>
+        <div class="setup-desc">En el perfil de actividad Correr &gt; Alertas &gt; FC &gt; Rango &gt; 116-134 bpm<br>
+        El reloj vibrara si salis de la zona. Crucial para forzar la disciplina en sesiones base.</div>
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="setup-num">5</div>
+      <div class="setup-content">
+        <div class="setup-title">Perfiles de actividad a configurar</div>
+        <div class="setup-desc">
+        <strong>Correr Z2</strong> - FC alerta 116-134<br>
+        <strong>Correr Intervalos</strong> - Paso alerta 4:10-4:20/km<br>
+        <strong>Correr Umbral</strong> - FC alerta 147-161<br>
+        <strong>Fuerza</strong> - Sin alertas FC, tiempo<br>
+        <strong>Interior</strong> - Para Ski Erg y Row Erg
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="garmin-section">
+    <div class="garmin-section-title">🏃 Entrenamientos para programar en Garmin Connect</div>
+    <div class="alert alert-blue">Garmin Connect app &gt; Entrenamiento &gt; Mis Entrenamientos &gt; Crear &gt; Carrera. Programar estos 5 entrenamientos clave y sincronizar al reloj.</div>
+
+    <div class="workout-card">
+      <div class="workout-name">CARRERA Z2 BASE</div>
+      <span class="workout-type-badge" style="background:var(--blue)">Carrera</span>
+      <div class="workout-steps">
+        <div class="workout-step"><span class="step-num">1.</span> Calentamiento: 5 min caminata/trote muy suave</div>
+        <div class="workout-step"><span class="step-num">2.</span> Principal: 35-55 min en Zona 2 (FC 116-134 bpm)</div>
+        <div class="workout-step"><span class="step-num">3.</span> Strides (x2): 80m a 4:00/km - recuperacion completa entre cada uno</div>
+        <div class="workout-step"><span class="step-num">4.</span> Enfriamiento: 5 min caminata</div>
+        <div class="workout-step"><span class="step-num">⚠</span> Si FC supera 134: bajar el paso hasta volver a zona</div>
+      </div>
+    </div>
+
+    <div class="workout-card">
+      <div class="workout-name">INTERVALOS VO2MAX 5x1KM</div>
+      <span class="workout-type-badge" style="background:var(--red)">Carrera Intensa</span>
+      <div class="workout-steps">
+        <div class="workout-step"><span class="step-num">1.</span> Calentamiento: 15 min suave + 4 strides</div>
+        <div class="workout-step"><span class="step-num">2.</span> Repeticion 1: 1 km a 4:10-4:20/km (Zona 5)</div>
+        <div class="workout-step"><span class="step-num">3.</span> Recuperacion: 90 segundos caminata/trote lento</div>
+        <div class="workout-step"><span class="step-num">4.</span> Repetir pasos 2-3 hasta 5 repeticiones</div>
+        <div class="workout-step"><span class="step-num">5.</span> Enfriamiento: 10 min suave</div>
+        <div class="workout-step"><span class="step-num">⚠</span> FC debe alcanzar Z5 (161+) en rep 4 y 5</div>
+      </div>
+    </div>
+
+    <div class="workout-card">
+      <div class="workout-name">TEMPO / UMBRAL</div>
+      <span class="workout-type-badge" style="background:var(--orange)">Carrera Umbral</span>
+      <div class="workout-steps">
+        <div class="workout-step"><span class="step-num">1.</span> Calentamiento: 10 min suave</div>
+        <div class="workout-step"><span class="step-num">2.</span> Bloque 1: 15 min a 4:35-4:45/km (FC 147-161)</div>
+        <div class="workout-step"><span class="step-num">3.</span> Recuperacion: 2 min trote suave</div>
+        <div class="workout-step"><span class="step-num">4.</span> Bloque 2: 15 min a 4:35-4:45/km</div>
+        <div class="workout-step"><span class="step-num">5.</span> Enfriamiento: 10 min suave</div>
+        <div class="workout-step"><span class="step-num">Progresion:</span> Avanzar a 25 min continuo en Fase 3</div>
+      </div>
+    </div>
+
+    <div class="workout-card">
+      <div class="workout-name">RITMO HYROX 4x2KM</div>
+      <span class="workout-type-badge" style="background:var(--purple)">Especifico HYROX</span>
+      <div class="workout-steps">
+        <div class="workout-step"><span class="step-num">1.</span> Calentamiento: 10 min suave</div>
+        <div class="workout-step"><span class="step-num">2.</span> Repeticion: 2 km a 4:20-4:30/km</div>
+        <div class="workout-step"><span class="step-num">3.</span> Recuperacion: 90 segundos</div>
+        <div class="workout-step"><span class="step-num">4.</span> Repetir 4 veces (total 8 km de calidad)</div>
+        <div class="workout-step"><span class="step-num">5.</span> Enfriamiento: 10 min suave</div>
+        <div class="workout-step"><span class="step-num">⚠</span> Este es el paso objetivo para HYROX Rio</div>
+      </div>
+    </div>
+
+    <div class="workout-card">
+      <div class="workout-name">CARRERA LARGA + TEMPO FINAL</div>
+      <span class="workout-type-badge" style="background:var(--blue2)">Carrera Larga</span>
+      <div class="workout-steps">
+        <div class="workout-step"><span class="step-num">1.</span> 60-70 min en Zona 2 (FC 116-134)</div>
+        <div class="workout-step"><span class="step-num">2.</span> Ultimos 20 min: acelerar a umbral (FC 147-161)</div>
+        <div class="workout-step"><span class="step-num">3.</span> Enfriamiento 5 min</div>
+        <div class="workout-step"><span class="step-num">⚠</span> Solo en Fases 2-4. En Fase 1 todo a Z2.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="garmin-section">
+    <div class="garmin-section-title">📈 Metricas prioritarias del Garmin</div>
+    <div class="card" style="padding:12px">
+      <div class="detail-item"><span class="detail-step">1</span><span><strong>HRV Status</strong> (Morning Report) - Revision diaria. Verde = entrenar. Rojo = bajar intensidad.</span></div>
+      <div class="detail-item"><span class="detail-step">2</span><span><strong>Body Battery</strong> - Antes de sesion intensa: minimo 60%. Si menos, cambiar a Z2.</span></div>
+      <div class="detail-item"><span class="detail-step">3</span><span><strong>VO2max estimado</strong> - Meta: de 52 a 58-62. Revisar semanalmente.</span></div>
+      <div class="detail-item"><span class="detail-step">4</span><span><strong>Training Load</strong> - Mantener en rango "Optimo". Evitar "Sobreesfuerzo" por mas de 2 dias.</span></div>
+      <div class="detail-item"><span class="detail-step">5</span><span><strong>Lactate Threshold</strong> - El reloj lo estima automaticamente. Objetivo: pasar de ~4:50/km a 4:30/km.</span></div>
+      <div class="detail-item"><span class="detail-step">6</span><span><strong>Sleep Score</strong> - Meta: 75+. Si promedio semanal bajo 60: reducir carga de entrenamiento.</span></div>
+    </div>
+  </div>
+
+  <div class="garmin-section">
+    <div class="garmin-section-title">📱 Apps complementarias</div>
+    <div class="card" style="padding:12px">
+      <div class="detail-item"><span class="detail-step">📈</span><span><strong>Bevel</strong> - HRV manana antes de levantarte. Integra con Apple Health. Usar diariamente.</span></div>
+      <div class="detail-item"><span class="detail-step">💪</span><span><strong>Gravl</strong> - Registro de fuerza. Programar Sesion A y B. Ver progresion de cargas semanalmente.</span></div>
+      <div class="detail-item"><span class="detail-step">🏋</span><span><strong>HYVE</strong> - Clases HYROX especificas. Priorizar sesiones de tecnica de estaciones. No reemplaza simulaciones.</span></div>
+      <div class="detail-item"><span class="detail-step">🍎</span><span><strong>Apple Health</strong> - Hub central. Asegurar que Garmin, Bevel y Gravl sincronizan alli.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab(&#39;hoy&#39;,this)">
+    <div class="tab-icon">🏠</div>
+    <div class="tab-label">Hoy</div>
+  </div>
+  <div class="tab" onclick="switchTab(&#39;semana&#39;,this)">
+    <div class="tab-icon">📅</div>
+    <div class="tab-label">Semana</div>
+  </div>
+  <div class="tab" onclick="switchTab(&#39;plan&#39;,this)">
+    <div class="tab-icon">📊</div>
+    <div class="tab-label">Plan 24S</div>
+  </div>
+  <div class="tab" onclick="switchTab(&#39;garmin&#39;,this)">
+    <div class="tab-icon">⌛</div>
+    <div class="tab-label">Garmin</div>
+  </div>
+</div>
+
+<script>
+// ==================== DATA ====================
+var RACE_DATE = new Date('2026-11-20');
+var PLAN_START = new Date('2026-06-17');
+
+var SESSION_TYPES = {
+  z2:{label:'Carrera Z2',color:'#2196F3',dotClass:'dot-z2'},
+  umbral:{label:'Umbral/Tempo',color:'#FF9800',dotClass:'dot-umbral'},
+  intervalos:{label:'Intervalos VO2max',color:'#F44336',dotClass:'dot-intervalos'},
+  larga:{label:'Carrera Larga',color:'#1565C0',dotClass:'dot-larga'},
+  fuerzaA:{label:'Fuerza A',color:'#4CAF50',dotClass:'dot-fuerzaA'},
+  fuerzaB:{label:'Fuerza B',color:'#2E7D32',dotClass:'dot-fuerzaB'},
+  hyrox:{label:'HYROX Tecnica',color:'#9C27B0',dotClass:'dot-hyrox'},
+  simulacion:{label:'Simulacion HYROX',color:'#6A1B9A',dotClass:'dot-simulacion'},
+  recuperacion:{label:'Recuperacion Activa',color:'#607D8B',dotClass:'dot-recuperacion'},
+  descanso:{label:'Descanso Completo',color:'#333',dotClass:'dot-descanso'},
+  competencia:{label:'COMPETENCIA',color:'#FFD700',dotClass:'dot-competencia'},
+  media_maraton:{label:'Media Maraton BA',color:'#00897B',dotClass:'dot-media_maraton'},
+  maraton:{label:'Maraton BA',color:'#FF5722',dotClass:'dot-maraton'},
+  descarga:{label:'Descarga',color:'#78909C',dotClass:'dot-descarga'}
+};
+
+// Session library
+var S = {
+  // Z2 runs
+  z2_45: {type:'z2',name:'Carrera Z2',dur:'50 min',desc:'Carrera aerobica base — el fundamento de toda la temporada.',
+    details:['Calentamiento 5 min caminata','35-45 min continuo FC 116-134 bpm (Z2)','Si FC sube de 134: bajar el paso inmediatamente','2x80m strides a 4:00/km (ultimos 8 min)','Enfriamiento 5 min caminata'],
+    garmin:'Perfil "Carrera Z2" | Alerta FC: 116-134 | Duracion: 50 min'},
+  z2_35: {type:'z2',name:'Carrera Z2 Corta',dur:'40 min',desc:'Sesion aerobica corta. Ritmo conversacional toda la sesion.',
+    details:['Calentamiento 3 min','30-35 min continuo FC 116-134','Drills de economia: A-march 2x20m, skip 2x20m','Enfriamiento 5 min'],
+    garmin:'Perfil "Carrera Z2" | Alerta FC 116-134 | Duracion: 40 min'},
+  z2_55: {type:'z2',name:'Carrera Z2 Extendida',dur:'60 min',desc:'Sesion aerobica larga para construir base solida.',
+    details:['Calentamiento 5 min','50 min continuo FC 116-134 bpm','3x80m strides al final','Drills post-carrera 10 min','Enfriamiento 5 min'],
+    garmin:'Perfil "Carrera Z2" | Duracion: 60 min | Alerta FC 116-134'},
+
+  // Threshold
+  umbral_2x10: {type:'umbral',name:'Tempo 2x10 min',dur:'40 min',desc:'Primera exposicion al umbral de lactato. Esfuerzo controlado.',
+    details:['Calentamiento 10 min suave','Bloque 1: 10 min a 4:50-5:00/km (FC 147-155)','Recuperacion 3 min trote suave','Bloque 2: 10 min a 4:50-5:00/km','Enfriamiento 10 min suave'],
+    garmin:'Perfil "Umbral" | Alertas paso: 4:50-5:00/km | Total ~40 min'},
+  umbral_2x15: {type:'umbral',name:'Tempo 2x15 min',dur:'45 min',desc:'Desarrollo del umbral de lactato. Clave para el ritmo HYROX.',
+    details:['Calentamiento 10 min suave','Bloque 1: 15 min a 4:35-4:45/km (FC 147-161)','Recuperacion 2 min','Bloque 2: 15 min a 4:35-4:45/km','Enfriamiento 10 min'],
+    garmin:'Alerta paso: 4:35-4:45/km (Z4) | Total ~45 min'},
+  umbral_30: {type:'umbral',name:'Tempo 30 min continuo',dur:'50 min',desc:'Umbral continuo — la sesion mas importante para HYROX.',
+    details:['Calentamiento 10 min suave','30 min continuos a 4:30-4:40/km (FC 147-161)','Mantener paso uniforme — no acelerar al final','Enfriamiento 10 min suave'],
+    garmin:'Alerta paso: 4:30-4:40/km | FC objetivo Z4 (147-161)'},
+
+  // Intervals
+  int_5x1: {type:'intervalos',name:'Intervalos 5x1km VO2max',dur:'55 min',desc:'La sesion mas dura del plan. Desarrolla potencia aerobica maxima.',
+    details:['Calentamiento 15 min suave + 4 strides','Rep 1-5: 1 km a 4:10-4:20/km (FC Z5 161+)','Recuperacion 90 seg caminata entre repeticiones','La FC debe llegar a Z5 en las ultimas 2 reps','Enfriamiento 10 min suave'],
+    garmin:'Perfil "Intervalos" | Paso 4:10-4:20/km | 5 reps x 1km + 90s rec'},
+  int_6x1: {type:'intervalos',name:'Intervalos 6x1km VO2max',dur:'60 min',desc:'Progresion — una repeticion mas. Mismo paso, mas volumen.',
+    details:['Calentamiento 15 min suave + 4 strides','6 x 1km a 4:10-4:20/km','90 seg recuperacion entre reps','Enfriamiento 10 min'],
+    garmin:'6 reps x 1km | Paso 4:10-4:20/km | 90s rec | Total ~60 min'},
+  int_3x2: {type:'intervalos',name:'Intervalos 3x2km',dur:'60 min',desc:'Intervalos largos — construyen resistencia especifica para HYROX.',
+    details:['Calentamiento 15 min + 4 strides','3 x 2km a 4:15-4:25/km (FC Z4-Z5)','Recuperacion 2 min entre repeticiones','Enfriamiento 10 min'],
+    garmin:'3 reps x 2km | Paso 4:15-4:25/km | 2 min rec'},
+  ritmo_hyrox: {type:'intervalos',name:'Ritmo HYROX 4x2km',dur:'60 min',desc:'Simulacion del paso de carrera en HYROX. El paso objetivo es 4:20-4:30/km.',
+    details:['Calentamiento 10 min suave','4 x 2km a 4:20-4:30/km (paso objetivo HYROX)','Recuperacion 90 seg entre repeticiones','Sensacion: controlado, no maximo','Enfriamiento 10 min'],
+    garmin:'4 reps x 2km | Paso 4:20-4:30/km | 90s rec | Perfil "Ritmo HYROX"'},
+
+  // Long runs
+  larga_60: {type:'larga',name:'Carrera Larga 60 min',dur:'60-65 min',desc:'Base aerobica larga. Todo a Z2. No sacrificar zona por volumen.',
+    details:['Todo Z2 — FC 116-134 bpm','Si el terreno sube: caminar para mantener zona','Al terminar: estiramientos 10 min obligatorio','Hidratacion: un sorbo de agua cada 20 min'],
+    garmin:'Perfil "Carrera Larga" | Alerta FC 116-134 | Duracion 60 min'},
+  larga_70t: {type:'larga',name:'Carrera Larga 70 min + Tempo',dur:'75-80 min',desc:'Larga con bloque de umbral al final — combina base y calidad.',
+    details:['50 min a Z2 (FC 116-134)','Ultimos 20 min: acelerar a umbral 4:35-4:45/km (FC 147-161)','Estiramientos obligatorios post-sesion','Proteina + carbos dentro de 30 min'],
+    garmin:'Primera parte: alerta FC 116-134 | Segunda parte: paso 4:35-4:45'},
+  larga_80t: {type:'larga',name:'Carrera Larga 80 min + Tempo',dur:'85-90 min',desc:'Carrera larga con bloque de calidad. Prepara especificamente para HYROX.',
+    details:['60 min a Z2 (FC 116-134)','Ultimos 20-25 min: paso HYROX 4:25-4:35/km','Enfriamiento 5 min','Recuperacion activa post-sesion obligatoria'],
+    garmin:'2 segmentos: 60 min Z2 + 20 min paso HYROX | Crear workout en Garmin Connect'},
+
+  // Fuerza A
+  fa_base: {type:'fuerzaA',name:'Fuerza A - Tren Inferior',dur:'55-60 min',desc:'Cadena posterior y glúteos. Clave para sled pull, lunges y correr eficiente.',
+    details:['Hip Thrust (barra): 4x12-15 con carga moderada','RDL Mancuernas: 3x10-12 — espalda neutra siempre','Sentadilla Goblet: 3x12','Estocada Reversa (MC): 3x10 cada lado','RDL una pierna: 3x8 cada lado','Elevacion talon sentado (soleo): 3x20 lento','Dead Bug: 3x8 cada lado','Adductor plank Copenhagen: 3x10 seg cada lado'],
+    garmin:'Registrar en Gravl: cargas y repeticiones de cada ejercicio'},
+  fa_build: {type:'fuerzaA',name:'Fuerza A - Build',dur:'60 min',desc:'Incremento de carga en cadena posterior. Enfasis en potencia glutea.',
+    details:['Hip Thrust: 4x12 — aumentar 5kg respecto semana anterior','RDL Mancuernas: 4x10 carga media-alta','Sentadilla Goblet: 3x15','Estocada Reversa: 3x12 cada lado (con mancuerna)','Good Morning: 3x12 peso ligero','Soleo: 3x20','Core: Pallof Press 3x12 cada lado'],
+    garmin:'Ver progresion de cargas en Gravl'},
+  fa_power: {type:'fuerzaA',name:'Fuerza A - Potencia-Resistencia',dur:'55 min',desc:'Misma carga, repeticiones mas rapidas. Simula demanda HYROX.',
+    details:['Hip Thrust: 4x20 velocidad explosiva','RDL: 4x12 controlado','Estocada caminando 4x20m (con pesas)','Step-up con mancuernas: 3x10 cada lado','KB Swing: 3x15 explosivo','Soleo: 3x20','Dead Bug: 3x8'],
+    garmin:'Anotar en Gravl — enfasis en velocidad de ejecucion'},
+
+  // Fuerza B
+  fb_base: {type:'fuerzaB',name:'Fuerza B - Funcional',dur:'55-60 min',desc:'Tren superior, jalones y fuerza funcional especifica HYROX.',
+    details:['Jalon al pecho (agarre amplio): 4x10-12 — prep Ski Erg','Remo en polea sentado: 3x12','Remo mancuerna un brazo: 3x10 c/lado','Farmer Carry: 4x30m carga pesada','Wall Ball: 4x20 con enfasis en empuje de piernas','KB Swing: 3x15','Pallof Press: 3x12 c/lado','Face Pull: 3x15 ligero'],
+    garmin:'Registrar en Gravl. Wall Ball: contar reps sin pausas.'},
+  fb_build: {type:'fuerzaB',name:'Fuerza B - Build',dur:'60 min',desc:'Incremento de carga en jalones y potencia de Farmer Carry.',
+    details:['Jalon: 4x10 — aumentar carga respecto semana anterior','Remo polea: 4x10','Farmer Carry: 4x40m carga pesada (aumentar)','Wall Ball: 4x25','KB Swing explosivo: 4x12','Remo TRX / invers: 3x12','Rotacion con cable: 3x12','Face Pull: 3x15'],
+    garmin:'Registrar cargas en Gravl semana a semana'},
+  fb_power: {type:'fuerzaB',name:'Fuerza B - Potencia-Resistencia',dur:'55 min',desc:'Alta velocidad de ejecucion. Simula fatiga de estaciones HYROX.',
+    details:['Jalon: 4x12 velocidad de tiron','Farmer Carry: 4x40m seguido de 20 Wall Balls SIN pausa','Wall Ball: 3x30 continuo (test)','KB Swing: 4x20 explosivo','Remo polea: 3x15','Pallof Press: 3x12','Curl biceps: 2x15 (salud tendinosa)'],
+    garmin:'Combo Farmer Carry + Wall Ball en Gravl como circuito'},
+
+  // HYROX
+  hyrox_tec: {type:'hyrox',name:'HYROX Tecnica',dur:'35-40 min',desc:'Tecnica de estaciones sin fatiga. Calidad sobre cantidad.',
+    details:['Ski Erg: 3x500m tecnica — empuje de lat + extension caderas','Row Erg: 3x500m tecnica — piernas-espalda-brazos','Wall Balls: 3x20 focus en empuje de caderas','Sin cronometro — observar forma, no tiempo','Descanso completo entre estaciones'],
+    garmin:'Actividad "Interior" o "Entreno de fuerza" en Garmin'},
+  hyrox_combo: {type:'hyrox',name:'HYROX Estaciones Combo',dur:'45-50 min',desc:'Combos de estaciones con algo de fatiga acumulada. Prepara la transicion.',
+    details:['Combo 1: Ski 500m + Row 500m x3 | Descanso 3 min','Combo 2: Farmer Carry 40m + 20 Wall Balls x3 | Descanso 2 min','Combo 3: Lunges 20m + 10 Burpee BD x2','Enfasis en transicion rapida entre estaciones'],
+    garmin:'Registrar tiempo de cada combo para tracking de progresion'},
+  hyrox_stations: {type:'hyrox',name:'HYROX Potencia Estaciones',dur:'45 min',desc:'Trabajo especifico de estaciones debiles: Sled Pull y Lunges.',
+    details:['Sled Pull 4x50m al peso de carrera — descanso completo','Lunges con sandbag: 4x20m progresando a 40m','Ski Erg: 2x1000m al paso objetivo (3:40)','Row Erg: 2x1000m al paso objetivo (3:45)','Burpee BD: 3x10 al ritmo de carrera'],
+    garmin:'Cronometrar tiempos de cada set — comparar con sesion anterior'},
+  sim_full: {type:'simulacion',name:'SIMULACION COMPLETA HYROX',dur:'60-75 min',desc:'Simulacion completa de carrera. Practicar el plan de carrera del dia de competencia.',
+    details:['Run 1: 1km a 4:35/km (CONSERVADOR)','Ski Erg 1000m — objetivo: sub 3:48','Run 2: 1km a 4:30/km','Sled Push 50m','Run 3: 1km','Sled Pull 50m — tecnica doble brazo','Run 4: 1km','Burpee BD 80m — ritmo, no velocidad','Run 5: 1km','Row Erg 1000m — objetivo: sub 3:58','Run 6: 1km','Farmer Carry 200m','Run 7: 1km','Lunges 100m — paso continuo','Run 8: 1km','Wall Balls 100 reps — sin parar','DEBRIEF escrito dentro de las 24 hs'],
+    garmin:'Actividad "HYROX Sim" — guardar splits completos. Compartir con el equipo.'},
+
+  // Recovery
+  recup: {type:'recuperacion',name:'Recuperacion Activa',dur:'30-40 min',desc:'Movimiento de baja intensidad para acelerar recuperacion. NO es un dia libre de esfuerzo.',
+    details:['Caminata 20-30 min (FC < 110)','Movilidad: cadera 90/90, rodilla al pecho, piriforme','Foam roll: cuadriceps, IT band, gemelos, lats','Face pull con goma 3x20','Hombros CARs: 5 circulos c/direccion c/brazo','Si hay acceso: sauna o ducha de contraste'],
+    garmin:'Actividad "Caminata" o "Yoga" — solo para registrar movimiento'},
+  descanso: {type:'descanso',name:'Descanso Completo',dur:'---',desc:'Sin entrenamiento. Recuperacion y adaptacion.',
+    details:['Sin sesion de entrenamiento estructurada','Caminata casual hasta 30 min si queres','Prioridad: dormir 8 hs o mas','Nutricion: mantener proteina alta (170g)','Hidratacion normal','Foam roll si hay dolor muscular especifico'],
+    garmin:'Sin actividad en Garmin. Chequear morning report y anotar HRV.'},
+
+  // Special
+  hm_race: {type:'media_maraton',name:'MEDIA MARATON BUENOS AIRES',dur:'~2:10-2:20',desc:'No es una carrera — es un entrenamiento de larga distancia disfrazado de carrera.',
+    details:['OBJETIVO: terminar a 5:00-5:10/km. NO ir mas rapido.','El cuerpo no sabe que hay una largada. Salir conservador.','Primer 5km: 5:15-5:20/km maximo, aunque te sientas bien','FC objetivo: no superar 155 bpm en ningun momento','Si FC sube de 155: bajar el paso inmediatamente','Hidratarse en cada punto de hidratacion','Post-carrera: proteina + carbos dentro de 30 min'],
+    garmin:'Actividad "Carrera" | Alerta FC max 155 | GPS On | Guardar resultado completo'},
+  maraton_race: {type:'maraton',name:'MARATON BUENOS AIRES — PASO SUAVE',dur:'~5:30-5:45/km',desc:'DECISION CRITICA: Esta carrera es un estimulo aerobico largo, NO una competencia.',
+    details:['ORDEN ESTRICTA: NO correr mas rapido de 5:30/km en ningun momento','Paso objetivo: 5:30-5:45/km TODO el tiempo','FC maxima tolerada: 145 bpm. Si supera: caminar.','Hidratacion cada punto — la recuperacion depende de esto','Si el cuerpo pide ir mas rapido: NO. HYROX Rio es en 8 semanas.','Post-maraton: semana completa de descarga obligatoria'],
+    garmin:'Alerta FC max 145 bpm | ALERTA PASO MINIMO 5:30/km | Guardar toda la data'},
+  descarga_d: {type:'descarga',name:'Dia de Descarga',dur:'20-30 min',desc:'Semana de descarga. Movimiento suave sin estres fisiologico.',
+    details:['Caminata 20-30 min o nada','FC nunca supera 110 bpm','Sin ejercicio de fuerza','Sin estaciones HYROX','Foam roll y movilidad si se quiere','Dormir: prioridad maxima (8+ hs)'],
+    garmin:'Solo registrar caminata si se hace. No entrenar.'}
+};
+
+// ==================== 24-WEEK PLAN ====================
+var WEEKS = [
+  // FASE 1: BASE (Semanas 1-5)
+  {w:1,phase:'Fase 1 — Base',focus:'Base aerobica + forma de carrera',vol:'80%',dates:'17-23 jun',
+   days:[S.z2_45,S.fa_base,S.z2_35,S.fb_base,S.recup,S.umbral_2x10,S.descanso]},
+  {w:2,phase:'Fase 1 — Base',focus:'Economia + strides',vol:'85%',dates:'24-30 jun',
+   days:[S.z2_45,S.fa_base,S.z2_35,S.fb_base,S.recup,S.umbral_2x10,S.descanso]},
+  {w:3,phase:'Fase 1 — Base',focus:'Umbral inicial',vol:'90%',dates:'1-7 jul',
+   days:[S.z2_55,S.fa_build,S.z2_35,S.fb_build,S.recup,S.umbral_2x15,S.descanso]},
+  {w:4,phase:'Fase 1 — DESCARGA',focus:'Semana de descarga — recuperacion',vol:'60%',dates:'8-14 jul',special:'descarga',
+   days:[S.descarga_d,S.descarga_d,S.recup,S.descarga_d,S.recup,S.z2_35,S.descanso]},
+  {w:5,phase:'Fase 1 — Base',focus:'Economia + volumen',vol:'90%',dates:'15-21 jul',
+   days:[S.z2_55,S.fa_build,S.z2_45,S.fb_build,S.recup,S.umbral_2x15,S.descanso]},
+
+  // FASE 2: BUILD I (Semanas 6-10)
+  {w:6,phase:'Fase 2 — Build I',focus:'Introduccion VO2max + estaciones',vol:'95%',dates:'22-28 jul',
+   days:[S.z2_45,S.fa_build,S.int_5x1,S.fb_build,S.recup,S.larga_60,S.descanso]},
+  {w:7,phase:'Fase 2 — Build I',focus:'Umbral intenso + combos estaciones',vol:'95%',dates:'29 jul - 4 ago',
+   days:[S.z2_45,S.fa_build,S.umbral_30,S.fb_power,S.recup,S.larga_70t,S.descanso]},
+  {w:8,phase:'Fase 2 — Build I',focus:'Paso HYROX + fuerza',vol:'100%',dates:'5-11 ago',
+   days:[S.z2_45,S.fa_power,S.int_6x1,S.fb_power,S.recup,S.larga_70t,S.descanso]},
+  {w:9,phase:'Fase 2 — DESCARGA',focus:'Descarga activa',vol:'65%',dates:'12-18 ago',special:'descarga',
+   days:[S.z2_35,S.fa_base,S.recup,S.hyrox_tec,S.recup,S.z2_45,S.descanso]},
+  {w:10,phase:'Fase 2 — Taper HM',focus:'Afinacion Media Maraton',vol:'80%',dates:'19-25 ago',special:'carrera',
+   days:[S.z2_35,S.fa_base,S.umbral_2x10,S.recup,S.recup,S.descanso,S.hm_race]},
+
+  // FASE 3: BUILD II (Semanas 11-15)
+  {w:11,phase:'Fase 3 — Build II',focus:'Recuperacion HM + reinicio',vol:'75%',dates:'26 ago - 1 sep',
+   days:[S.z2_35,S.fa_base,S.z2_45,S.fb_base,S.recup,S.z2_55,S.descanso]},
+  {w:12,phase:'Fase 3 — Build II',focus:'HYROX especifico + sim #3',vol:'100%',dates:'2-8 sep',
+   days:[S.z2_45,S.fa_power,S.ritmo_hyrox,S.fb_power,S.recup,S.sim_full,S.descanso]},
+  {w:13,phase:'Fase 3 — Build II',focus:'Pico de intensidad',vol:'100%',dates:'9-15 sep',
+   days:[S.z2_45,S.fa_power,S.int_3x2,S.hyrox_stations,S.recup,S.sim_full,S.descanso]},
+  {w:14,phase:'Fase 3 — Build II',focus:'Taper Maraton',vol:'85%',dates:'16-22 sep',special:'carrera',
+   days:[S.z2_35,S.fa_base,S.umbral_2x10,S.hyrox_tec,S.recup,S.descanso,S.descanso]},
+  {w:15,phase:'Fase 3 — MARATON',focus:'Semana de Maraton',vol:'70%',dates:'20 sep-27 sep',special:'maraton',
+   days:[S.z2_35,S.recup,S.descanso,S.recup,S.descanso,S.recup,S.maraton_race]},
+
+  // FASE 3.5: RECUPERACION MARATON (Semana 16)
+  {w:16,phase:'Recuperacion Maraton — DESCARGA',focus:'Recuperacion obligatoria post-maraton',vol:'50%',dates:'28 sep - 4 oct',special:'descarga',
+   days:[S.recup,S.descarga_d,S.recup,S.descarga_d,S.recup,S.z2_35,S.descanso]},
+
+  // FASE 4: SHARPENING (Semanas 17-20)
+  {w:17,phase:'Fase 4 — Afilamiento',focus:'Retorno a intensidad + sim #5',vol:'85%',dates:'5-11 oct',
+   days:[S.z2_45,S.fa_power,S.umbral_30,S.hyrox_stations,S.recup,S.sim_full,S.descanso]},
+  {w:18,phase:'Fase 4 — Afilamiento',focus:'Pico de simulaciones',vol:'100%',dates:'12-18 oct',
+   days:[S.z2_45,S.fa_power,S.ritmo_hyrox,S.hyrox_stations,S.recup,S.sim_full,S.descanso]},
+  {w:19,phase:'Fase 4 — Afilamiento',focus:'Afinacion final',vol:'95%',dates:'19-25 oct',
+   days:[S.z2_45,S.fa_build,S.int_3x2,S.hyrox_combo,S.recup,S.sim_full,S.descanso]},
+  {w:20,phase:'Fase 4 — Pre-Taper DESCARGA',focus:'Descarga previa al taper',vol:'65%',dates:'26 oct - 1 nov',special:'descarga',
+   days:[S.z2_35,S.fa_base,S.z2_45,S.hyrox_tec,S.recup,S.larga_60,S.descanso]},
+
+  // FASE 5: TAPER (Semanas 21-23)
+  {w:21,phase:'Fase 5 — Taper',focus:'Mantener filo — bajar volumen',vol:'55%',dates:'2-8 nov',
+   days:[S.z2_35,{type:'fuerzaA',name:'Fuerza A Activacion',dur:'40 min',desc:'50% carga — mantener patron de movimiento.',details:['Todos los ejercicios a 50% de la carga habitual','Enfasis en calidad de movimiento, no carga','Hip Thrust: 2x10','RDL: 2x10','Goblet Squat: 2x10','Dead Bug: 2x8'],garmin:'Registrar en Gravl para tracking de cargas'},S.umbral_2x10,S.hyrox_tec,S.recup,S.z2_35,S.descanso]},
+  {w:22,phase:'Fase 5 — Taper',focus:'Filo de carrera + sim #8 reducida',vol:'45%',dates:'9-15 nov',
+   days:[S.z2_35,{type:'fuerzaA',name:'Activacion General',dur:'35 min',desc:'Activacion neuromuscular — sin fatiga.',details:['30% carga','Movimientos principales: Hip Thrust 2x8, RDL 2x8','Farmer Carry 2x20m','Wall Balls 2x15','Enfriamiento con movilidad'],garmin:'Ultima sesion de fuerza — Registrar en Gravl'},S.umbral_2x10,S.recup,S.recup,{type:'simulacion',name:'SIM #8 — 50% esfuerzo',dur:'35-40 min',desc:'Media simulacion de activacion. No buscar tiempo.',details:['4 runs de 1km a 4:35-4:40/km','Ski 500m activacion','Row 500m activacion','Wall Balls 30 reps','Farmer Carry 100m','FIN — no agotar el tanque'],garmin:'Actividad HYROX — guardar como "Activacion Pre-Rio"'},S.descanso]},
+  {w:23,phase:'Fase 5 — Semana de Carrera',focus:'Activacion + viaje a Rio',vol:'30%',dates:'16-20 nov',special:'carrera',
+   days:[S.z2_35,{type:'recuperacion',name:'Activacion Leve',dur:'25 min',desc:'Ultimo entrenamiento real antes de la carrera.',details:['15 min suave','4 strides a paso HYROX','5 min Ski activacion','5 min Row activacion','Estiramientos 10 min'],garmin:'Ultima sesion Garmin — revisar todo: bateria, sensors, app'},S.recup,S.recup,{type:'recuperacion',name:'Llegada a Rio',dur:'---',desc:'Viaje y llegada. Descanso completo.',details:['Llegada a Rio de Janeiro','Hidratacion extra (calor y humedad)','Caminata suave 20 min para activar piernas','Revision de equipamiento de carrera','Pasta + proteina a la noche','Dormir: prioridad absoluta'],garmin:'Sin actividad. Bateria Garmin al 100%.'},S.descanso,{type:'competencia',name:'HYROX RIO DE JANEIRO',dur:'Sub 60 min',desc:'DIA DE CARRERA. La mejor version atletica de Ezequiel Morisio.',details:['3:00 antes del largue: desayuno 80-100g CHO + 25g proteina','Llegar al venue 75 min antes','Calentamiento 10 min suave + drills + activacion Ski','Cafeina 200mg 60 min antes del largue','Run 1: 4:35/km — CONSERVADOR pase lo que pase','HYROX Rio — EJECUTAR EL PLAN','DEJAR TODO EN LA PISTA'],garmin:'Modo HYROX / Triathlon en Garmin | FC visible en pantalla | Guardar TODO'}]},
+];
+
+// Days of week labels
+var DAY_LABELS = ['LUN','MAR','MIE','JUE','VIE','SAB','DOM'];
+
+// ==================== STATE ====================
+var currentViewWeek = 0; // 0-indexed
+
+function getTodayWeekDay() {
+  var today = new Date();
+  var msPerWeek = 7*24*60*60*1000;
+  var diffMs = today - PLAN_START;
+  if(diffMs < 0) return {week:0, day:0};
+  var weekIdx = Math.min(Math.floor(diffMs/msPerWeek), WEEKS.length-1);
+  var dayInWeek = today.getDay(); // 0=Sun,1=Mon...6=Sat
+  // Convert: plan starts Monday, so Mon=0,Tue=1...Sun=6
+  var planDay = (dayInWeek + 6) % 7;
+  return {week:weekIdx, day:planDay};
+}
+
+function getDaysUntilRace() {
+  var today = new Date();
+  today.setHours(0,0,0,0);
+  var race = new Date(RACE_DATE);
+  race.setHours(0,0,0,0);
+  return Math.max(0, Math.round((race-today)/(1000*60*60*24)));
+}
+
+// ==================== RENDER ====================
+function getTypeStyle(type) {
+  var t = SESSION_TYPES[type] || SESSION_TYPES.descanso;
+  return t;
+}
+
+function renderSessionCard(session, expanded) {
+  if(!session) return '';
+  var ts = getTypeStyle(session.type);
+  var detailsHTML = '';
+  if(session.details) {
+    detailsHTML = '<div class="session-details">';
+    for(var i=0;i<session.details.length;i++){
+      detailsHTML += '<div class="detail-item"><span class="detail-step">'+(i+1)+'</span><span>'+session.details[i]+'</span></div>';
+    }
+    detailsHTML += '</div>';
+    if(session.garmin) {
+      detailsHTML += '<div class="garmin-box"><div class="garmin-title">&#8987; Garmin</div><div class="garmin-text">'+session.garmin+'</div></div>';
+    }
+  }
+  return '<div class="card type-'+session.type+'">'
+    +'<div class="session-header">'
+    +'<div class="session-type-dot '+ts.dotClass+'"></div>'
+    +'<div class="session-name">'+session.name+'</div>'
+    +'<div class="session-duration">'+session.dur+'</div>'
+    +'</div>'
+    +'<div class="session-desc">'+session.desc+'</div>'
+    +(expanded ? detailsHTML : '<button class="toggle-details" onclick="this.previousElementSibling.previousElementSibling; this.replaceWith(document.createRange().createContextualFragment(\''+escapeForAttr(detailsHTML)+'\'))">Ver detalle completo &#9660;</button>')
+    +'</div>';
+}
+
+function escapeForAttr(s){
+  return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'');
+}
+
+function renderToday() {
+  var td = getTodayWeekDay();
+  var week = WEEKS[td.week];
+  var session = week.days[td.day];
+  var today = new Date();
+  var dayNames = ['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
+  var monNames = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+  document.getElementById('today-date').textContent = dayNames[today.getDay()] + ', ' + today.getDate() + ' de ' + monNames[today.getMonth()] + ' ' + today.getFullYear();
+  document.getElementById('today-title').textContent = session.name;
+  document.getElementById('week-num-metric').textContent = td.week+1;
+
+  // Simulations count (estimate based on week)
+  var simCount = 0;
+  for(var i=0;i<=td.week;i++){for(var j=0;j<7;j++){if(WEEKS[i].days[j]&&WEEKS[i].days[j].type==='simulacion')simCount++;}}
+  document.getElementById('sessions-done').textContent = simCount;
+
+  var pct = Math.round(((td.week*7+td.day)/(24*7))*100);
+  document.getElementById('season-progress').style.width = pct+'%';
+  document.getElementById('progress-pct').textContent = pct+'% del plan';
+
+  document.getElementById('today-session-container').innerHTML = renderSessionCard(session, true);
+}
+
+function renderWeekView(weekIdx) {
+  var week = WEEKS[weekIdx];
+  var td = getTodayWeekDay();
+  document.getElementById('week-nav-label').textContent = 'Semana '+week.w+' de 24';
+  document.getElementById('week-nav-phase').textContent = week.phase + ' | ' + week.vol + ' volumen | ' + week.dates;
+
+  var html = '';
+  if(week.special==='descarga') html += '<div class="alert alert-blue">Semana de descarga — reducir volumen e intensidad. Priorizar recuperacion y sueno.</div>';
+  if(week.special==='carrera'||week.special==='maraton') html += '<div class="alert alert-red">Semana de competencia — seguir el plan de carrera estrictamente.</div>';
+
+  for(var i=0;i<7;i++){
+    var s = week.days[i];
+    var isToday = (weekIdx===td.week && i===td.day);
+    var ts = getTypeStyle(s.type);
+    html += '<div class="day-card" onclick="toggleDay(this)">'
+      +'<div class="day-header" style="border-left:3px solid '+ts.color+'">'
+      +'<div class="day-name">'+DAY_LABELS[i]+'</div>'
+      +'<div class="day-session">'
+      +'<div class="day-session-name">'+s.name+'</div>'
+      +'<div class="day-session-meta">'+s.dur+' &bull; '+ts.label+'</div>'
+      +'</div>'
+      +(isToday?'<div class="day-today-badge">HOY</div>':'')
+      +'</div>'
+      +'<div class="day-expanded">'
+      +'<div style="font-size:12px;color:var(--txt2);margin-bottom:8px">'+s.desc+'</div>';
+    if(s.details){
+      for(var j=0;j<s.details.length;j++){
+        html += '<div class="detail-item"><span class="detail-step">'+(j+1)+'</span><span style="font-size:12px;color:var(--txt2)">'+s.details[j]+'</span></div>';
+      }
+    }
+    if(s.garmin){
+      html += '<div class="garmin-box" style="margin-top:8px"><div class="garmin-title">&#8987; Garmin</div><div class="garmin-text">'+s.garmin+'</div></div>';
+    }
+    html += '</div></div>';
+  }
+  document.getElementById('week-days-container').innerHTML = html;
+}
+
+function toggleDay(el) {
+  var exp = el.querySelector('.day-expanded');
+  if(exp) exp.classList.toggle('open');
+}
+
+function changeWeek(dir) {
+  currentViewWeek = Math.max(0, Math.min(WEEKS.length-1, currentViewWeek+dir));
+  renderWeekView(currentViewWeek);
+}
+
+function renderPlan() {
+  var td = getTodayWeekDay();
+  var phases = {};
+  var phaseOrder = [];
+  for(var i=0;i<WEEKS.length;i++){
+    var ph = WEEKS[i].phase;
+    if(!phases[ph]){phases[ph]=[];phaseOrder.push(ph);}
+    phases[ph].push(WEEKS[i]);
+  }
+  var html = '';
+  for(var p=0;p<phaseOrder.length;p++){
+    var phName = phaseOrder[p];
+    var phWeeks = phases[phName];
+    html += '<div class="phase-section">';
+    html += '<div class="phase-header" onclick="togglePhase(this)">';
+    html += '<div class="phase-num">'+(p+1)+'</div>';
+    html += '<div class="phase-info"><div class="phase-name">'+phName+'</div><div class="phase-dates">'+phWeeks[0].dates+' — '+phWeeks[phWeeks.length-1].dates+'</div></div>';
+    html += '<div style="color:var(--txt3);font-size:18px">&#9660;</div>';
+    html += '</div>';
+    html += '<div class="phase-weeks-list">';
+    for(var w=0;w<phWeeks.length;w++){
+      var wk = phWeeks[w];
+      var isCurrent = (wk.w-1===td.week);
+      html += '<div class="week-row '+(isCurrent?'current-week':'')+'" onclick="jumpToWeek('+(wk.w-1)+')">';
+      html += '<div class="week-num">Sem '+(wk.w)+'</div>';
+      html += '<div class="week-focus">'+wk.focus+'</div>';
+      html += '<div class="week-vol">'+wk.vol+'</div>';
+      if(isCurrent) html += '<span class="week-badge badge-current">HOY</span>';
+      if(wk.special==='descarga') html += '<span class="week-badge badge-descarga">DESC</span>';
+      if(wk.special==='carrera'||wk.special==='maraton') html += '<span class="week-badge badge-competencia">COMP</span>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+  }
+  document.getElementById('plan-container').innerHTML = html;
+  document.getElementById('plan-current-week-label').textContent = 'Semana '+(td.week+1)+' de 24';
+}
+
+function togglePhase(el) {
+  var list = el.nextElementSibling;
+  list.style.display = list.style.display==='none' ? 'block' : 'none';
+}
+
+function jumpToWeek(idx) {
+  currentViewWeek = idx;
+  switchTab('semana', document.querySelectorAll('.tab')[1]);
+  renderWeekView(currentViewWeek);
+}
+
+// ==================== HEADER ====================
+function updateHeader() {
+  var td = getTodayWeekDay();
+  var week = WEEKS[td.week];
+  document.getElementById('header-phase').textContent = week.phase.split('—')[0].trim();
+  document.getElementById('header-week').textContent = 'Semana '+week.w+' de 24';
+  document.getElementById('header-dates').textContent = week.dates+' 2026';
+  document.getElementById('countdown-days').textContent = getDaysUntilRace();
+}
+
+// ==================== TAB SWITCH ====================
+function switchTab(name, el) {
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active')});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  document.getElementById('view-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+// ==================== SPLASH ====================
+function hideSplash() {
+  var splash = document.getElementById('splash');
+  if (!splash) return;
+  splash.classList.add('hide');
+  setTimeout(function() { splash.style.display = 'none'; }, 650);
+}
+
+// ==================== INIT ====================
+window.addEventListener('load', function() {
+  var td = getTodayWeekDay();
+  currentViewWeek = td.week;
+  updateHeader();
+  renderToday();
+  renderWeekView(currentViewWeek);
+  renderPlan();
+  // Update days remaining in splash
+  var splashRio = document.querySelector('.splash-rio');
+  if (splashRio) {
+    var d = getDaysUntilRace();
+    splashRio.textContent = d + ' dias para Rio';
+  }
+  // Auto-hide splash after 2.6 seconds
+  setTimeout(hideSplash, 2600);
+  // Tap anywhere to skip
+  document.getElementById('splash').addEventListener('click', hideSplash);
+});
+</script>
+
+</body></html>
